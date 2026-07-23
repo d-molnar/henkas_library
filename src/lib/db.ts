@@ -135,6 +135,25 @@ export async function deleteTag(id: string) {
 	});
 }
 
+/**
+ * Merge `fromId` into `intoId`: every book referencing the source now references
+ * the target (deduped), and the source tag is deleted. No-op if they're equal.
+ */
+export async function mergeTags(fromId: string, intoId: string) {
+	if (fromId === intoId) return;
+	await db.transaction('rw', db.tags, db.books, async () => {
+		const affected = await db.books.filter((b) => b.tagIds.includes(fromId)).toArray();
+		await Promise.all(
+			affected.map((b) => {
+				// swap fromId → intoId, then dedup while preserving order
+				const tagIds = [...new Set(b.tagIds.map((t) => (t === fromId ? intoId : t)))];
+				return db.books.update(b.id, { tagIds });
+			})
+		);
+		await db.tags.delete(fromId);
+	});
+}
+
 /** Find an existing book by ISBN (normalized). Used for duplicate detection on add. */
 export async function findByIsbn(rawIsbn: string): Promise<Book | undefined> {
 	const norm = normalizeIsbn(rawIsbn);
