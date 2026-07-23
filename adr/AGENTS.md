@@ -43,9 +43,10 @@ What becomes easier and harder as a result. Include the trade-offs we accepted.
 - `0001` — Frontend framework: SvelteKit (SPA + PWA)
 - `0002` — Local-first storage via IndexedDB/Dexie
 - `0003` — Bundled, dependency-free i18n
-- `0004` — Ownership derived from copy count (no `owned` flag)
+- `0004` — Ownership derived from copy count (no `owned` flag) — **superseded by 0008**
 - `0005` — Tags as entities; genres are a subset of tags
 - `0006` — ISBN is an attribute, not identity
 - `0007` — Stay on classic TypeScript (defer the Go native port)
+- `0008` — Ownership as a discriminated union; reading is orthogonal (supersedes 0004)
 
 Keep this index in sync when adding an ADR.

@@ -1,10 +1,10 @@
 ---
 id: 0004
 title: Ownership derived from copy count (no `owned` flag)
-status: accepted
+status: superseded
 date: 2026-07-22
 supersedes: null
-superseded_by: null
+superseded_by: 0008
 ---
 
 ## Context
