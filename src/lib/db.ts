@@ -92,7 +92,6 @@ export function live<T>(query: () => T | Promise<T>, initial: T): Readable<T> {
 
 // ── Reactive collections ──────────────────────────────────────────────
 export const books = live<Book[]>(() => db.books.toArray(), []);
-export const series = live<Series[]>(() => db.series.toArray(), []);
 export const loans = live<Loan[]>(() => db.loans.toArray(), []);
 export const activeLoans = live<Loan[]>(
 	() => db.loans.filter((l) => l.returnedAt == null).toArray(),
