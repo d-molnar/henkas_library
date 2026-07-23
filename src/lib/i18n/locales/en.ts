@@ -1,0 +1,105 @@
+export const en = {
+	// nav / shell
+	'nav.add': 'Add book',
+	'nav.shelf': 'Shelf',
+	'nav.add_short': 'Add',
+	'app.language': 'Language',
+
+	// statuses
+	'status.reading': 'Reading',
+	'status.to-read': 'To-read next',
+	'status.completed': 'Completed',
+	'status.wont-read': "Won't read",
+	'status.wishlist': 'Wishlist',
+	'section.reading': 'Reading now',
+
+	// shelf
+	'shelf.search': 'Search title, author, ISBN…',
+	'shelf.all': 'All',
+	'shelf.count': '{count} books',
+	'shelf.empty_title': 'Your shelf is empty',
+	'shelf.empty_body': 'Add your first book to get started.',
+	'shelf.empty_cta': 'Add a book',
+	'shelf.no_results': 'Nothing matches “{q}”.',
+	'shelf.on_loan': 'On loan',
+
+	// book form
+	'form.isbn_label': 'ISBN (optional — look up to auto-fill)',
+	'form.isbn_placeholder': '978… or 10-digit',
+	'form.lookup': 'Look up',
+	'form.looking': 'Looking…',
+	'form.isbn_invalid': "That doesn't look like a valid ISBN-10 or ISBN-13.",
+	'form.isbn_notfound': 'No match on Open Library — fill the details in by hand.',
+	'form.isbn_error': 'Lookup failed (offline?). You can still enter everything manually.',
+	'form.title': 'Title',
+	'form.author': 'Author',
+	'form.pages': 'Pages',
+	'form.status': 'Status',
+	'form.copies': 'Copies owned',
+	'form.copies_wishlist': '0 copies — this is a wishlist item.',
+	'form.genre': 'Genre',
+	'form.genre_ph': 'Fantasy, Sci-fi…',
+	'form.format': 'Format',
+	'form.format_ph': 'Hardcover, Paperback…',
+	'form.year': 'Year',
+	'form.price': 'Price paid (optional)',
+	'form.tags': 'Tags',
+	'form.add_submit': 'Add to shelf',
+	'form.save': 'Save changes',
+	'tag.placeholder': 'Add tags (Enter to confirm)',
+	'tag.placeholder_more': 'Add tag…',
+
+	// add modal + duplicate handling
+	'add.title': 'Add a book',
+	'dup.title': 'Already on your shelf',
+	'dup.body': '“{title}” is already in your library (ISBN match).',
+	'dup.add_copy': 'Add a copy',
+	'dup.add_anyway': 'Add as a separate entry',
+	'dup.cancel': 'Cancel',
+
+	// book detail
+	'detail.back': 'Shelf',
+	'detail.edit': 'Edit',
+	'detail.update_progress': 'Update progress',
+	'detail.progress': 'Reading progress',
+	'detail.of_pages': 'p. {cur} of {total} · {pct}%',
+	'detail.started': 'Started {date}',
+	'detail.inventory': 'Inventory & value',
+	'detail.copies': 'Copies owned',
+	'detail.format': 'Format',
+	'detail.paid': 'Paid',
+	'detail.est_value': 'Est. value',
+	'detail.add_copy': 'Add another copy',
+	'detail.notes': 'Notes',
+	'detail.notes_empty': 'No notes yet.',
+	'detail.edit_note': 'Edit note',
+	'detail.save_note': 'Save',
+	'detail.tags': 'Tags',
+	'detail.delete': 'Delete book',
+	'detail.delete_confirm': 'Remove “{title}” from your library?',
+	'detail.not_found': 'Book not found.',
+	'detail.rating': 'Rating',
+
+	// edit modal
+	'edit.title': 'Edit details',
+
+	// update-progress modal
+	'progress.title': 'Update progress',
+	'progress.unit_page': 'Page',
+	'progress.unit_percent': 'Percent',
+	'progress.of_pages': 'of {total} pages',
+	'progress.left': '{pct}% · {n} pages left',
+	'progress.session_note': 'Session note (optional)',
+	'progress.session_ph': 'Where you left off, a thought…',
+	'progress.mark_finished': 'Mark finished',
+	'progress.finished_hint': 'Finished it? Marks it Completed & logs today.',
+	'progress.cancel': 'Cancel',
+	'progress.save': 'Save progress',
+
+	// misc
+	'common.unowned': 'Not owned',
+	'common.unowned_price': 'Not owned · €{price} new',
+	'common.unrated': 'unrated'
+} as const;
+
+export type MessageKey = keyof typeof en;
