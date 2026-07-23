@@ -1,7 +1,7 @@
 ---
 id: 0012
 title: Split db.ts into bounded domain modules
-state: proposed
+state: in-progress
 module: lib/db → lib/{books,lending,tags,series}
 created: 2026-07-23
 updated: 2026-07-23

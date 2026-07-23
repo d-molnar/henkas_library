@@ -14,7 +14,7 @@
 		saveBookEdits
 	} from '$lib/db';
 	import { openProgress } from '$lib/ui.svelte';
-	import { tags as tagStore } from '$lib/db';
+	import { tags as tagStore } from '$lib/tags';
 	import { t, formatDate } from '$lib/i18n/index.svelte';
 	import BookCover from '$lib/components/BookCover.svelte';
 	import ProgressBar from '$lib/components/ProgressBar.svelte';
