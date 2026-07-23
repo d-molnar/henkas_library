@@ -144,13 +144,83 @@ Derivation rules per entry:
 - `removeEntry(entryId)` — also removes the id from any book's `entryIds`.
 - `deleteSeries(seriesId)` — cascades: delete its entries and unlink them from books.
 - `setBookEntries(bookId, entryIds[])` — validates entries exist and share one series.
-- `groupBooksIntoSeries(name, author, [{ bookId, ordinal, label?, title? }])` — the
-  mockup's "group books into a series" affordance: create the series + entries and link
-  the books, entry title defaulting to the book's title.
+- `ensureSeries(name, author): string` — find-or-create by name+author
+  (case-insensitive, mirrors `ensureTag`). Idempotent; used by the detection flows.
+- `ensureEntry(seriesId, ordinal, title): string` — find-or-create by ordinal within a
+  series. Idempotent.
 
 Dependency direction stays one-directional: `series` reads/writes the shared `books`
 table for linking, `books` never imports `series` (consistent with the module split
 from task 0012).
+
+## Detection & creation
+
+A series can be *recognized* (placed into an existing local series) or *discovered*
+(a new series proposed from external knowledge). These are deliberately separated:
+
+### Add-time recognition — local only
+
+When a book is added (ISBN scan / online search / manual), it is matched **only against
+series that already exist in the DB** — no network, never creates a series. A pure
+function:
+
+```ts
+type LocalMatch =
+  | { kind: 'entry';  entry: SeriesEntry }   // book title matches a named-missing entry
+  | { kind: 'series'; series: Series };      // author matches a local series, no entry match
+
+function matchLocalSeries(
+  book: { title: string; author: string },
+  series: Series[], entries: SeriesEntry[]
+): LocalMatch | null;
+```
+
+- **title → entry:** the book's title matches an existing entry's title
+  (case-insensitive) → the book fills that (often named-missing) slot. Highest signal.
+- **author → series:** author matches a local series but no entry matches → offer to add
+  the book as a *new entry within that existing series* (extend its roster).
+- No match → `null`; the book stays standalone until you group it later.
+
+Add-time only ever *places into* or *extends* a series that already exists locally.
+
+### Discovery — external, user-initiated
+
+Creating a **new** series and collecting its **full roster** happens only in an explicit
+detection flow, never passively at add time (this eliminates junk series from spotty
+hints). Two entry points, same review→create path:
+
+- **library-wide:** scan all **ungrouped** books (`entryIds == []`);
+- **single book:** "find this book's series" from the book detail screen.
+
+Both run over a set of books (1 or many) and use external knowledge:
+
+```ts
+// Best-effort external roster lookup (in openlibrary.ts). Coverage is UNRELIABLE —
+// Open Library's series data is sparse — so the review UI must allow manual fix/fill.
+function fetchSeriesRoster(name: string, author: string, signal?: AbortSignal)
+  : Promise<{ ordinal: number; title: string }[]>;
+
+// Pure: group candidate books by detected series name/author from their hints.
+function detectSeriesCandidates(
+  books: Book[], hints: Map<string /* bookId */, { series?: string }>
+): SeriesCandidate[];
+
+interface SeriesCandidate {
+  name: string;
+  author: string;
+  members: { book: Book; ordinal?: number }[];  // the user's books that fit
+  roster: { ordinal: number; title: string }[]; // fetched volumes (may be partial/empty)
+}
+```
+
+The flow: detect candidate series → fetch each roster (auto-collect volumes) → present
+for **review** (the user edits names/ordinals, adds missing volumes, drops wrong ones)
+→ on confirm, realize via `ensureSeries` + `ensureEntry` + `setBookEntries`. This is the
+single place where "all the volumes are collected, automatically **and** manually."
+
+The domain layer owns the pure functions (`matchLocalSeries`, `detectSeriesCandidates`)
+and `fetchSeriesRoster`; the **review UI** that presents candidates is part of the
+`/series` screen (task 0004).
 
 ## Persistence / seed
 
@@ -167,24 +237,39 @@ clear + reseed.
 
 ## Testing
 
-Pure unit tests for `deriveSeriesProgress` (vitest, alongside `ownership.test.ts`):
+Pure unit tests (vitest, alongside `ownership.test.ts`).
 
+`deriveSeriesProgress`:
 - omnibus: one owned book → three owned slots;
 - two editions: two owned books → one owned slot (not double-counted);
 - novella: half-ordinal sorts into the right position;
 - read-elsewhere: unowned + completed book → slot is `missing` yet `read`;
-- `missingCount` and both `next*` pointers;
-- ordinal-collision rejection in `addEntry`.
+- `missingCount` and both `next*` pointers.
+
+`matchLocalSeries`:
+- title matches a named-missing entry → `{ kind:'entry' }`;
+- author matches a local series, no title match → `{ kind:'series' }`;
+- no local series → `null` (proves add-time never fabricates a series).
+
+`detectSeriesCandidates`:
+- books sharing a series hint group into one candidate;
+- ungrouped books with no hint produce no candidate.
+
+Plus `addEntry` rejecting a duplicate ordinal, and `ensureSeries`/`ensureEntry`
+idempotency (second call returns the same id, creates nothing).
 
 ## Module placement
 
 All of this lives in `src/lib/series.ts`: the `series` store, a new `seriesEntries`
-store, `deriveSeriesProgress`, and the mutations. If the file grows unwieldy, splitting
-entries into their own module is a later follow-up.
+store, `deriveSeriesProgress`, the pure detection helpers (`matchLocalSeries`,
+`detectSeriesCandidates`), and the mutations. `fetchSeriesRoster` lives in
+`openlibrary.ts` alongside the other external lookups. If `series.ts` grows unwieldy,
+splitting entries or detection into their own module is a later follow-up.
 
 ## Out of scope (YAGNI / follow-ups)
 
-- The `/series` **screen** itself (task 0004 UI) — this spec is the domain it renders.
+- The `/series` **screen** and the discovery **review UI** (task 0004) — this spec is
+  the domain and pure logic they drive.
 - Cross-series crossovers (a book belonging to two series).
 - Sub-series / arcs within a series.
 - Real data migration (deferred until post-release, per the dev-phase rule).
