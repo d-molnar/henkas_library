@@ -3,7 +3,7 @@
 	import { openAdd } from '$lib/ui.svelte';
 	import { t } from '$lib/i18n/index.svelte';
 	import type { Book, Status } from '$lib/types';
-	import { READING_STATUSES } from '$lib/types';
+	import { READING_STATUSES, isWishlist } from '$lib/types';
 	import BookCard from '$lib/components/BookCard.svelte';
 	import Search from 'lucide-svelte/icons/search';
 	import Plus from 'lucide-svelte/icons/plus';
@@ -27,19 +27,19 @@
 
 	function inFilter(b: Book): boolean {
 		if (filter === 'all') return true;
-		if (filter === 'wishlist') return b.copies === 0;
-		return b.copies > 0 && b.status === filter;
+		if (filter === 'wishlist') return isWishlist(b);
+		return !isWishlist(b) && b.status === filter;
 	}
 
 	const filtered = $derived($books.filter((b) => matches(b) && inFilter(b)));
 
-	// Owned books (copies > 0) group by reading status; wishlist (copies === 0) is its own section last.
+	// Books group by reading status; wishlist items are their own section last.
 	const sectionDefs = $derived([
-		{ key: 'reading', label: t('section.reading'), pred: (b: Book) => b.copies > 0 && b.status === 'reading' },
-		{ key: 'to-read', label: t('status.to-read'), pred: (b: Book) => b.copies > 0 && b.status === 'to-read' },
-		{ key: 'completed', label: t('status.completed'), pred: (b: Book) => b.copies > 0 && b.status === 'completed' },
-		{ key: 'wont-read', label: t('status.wont-read'), pred: (b: Book) => b.copies > 0 && b.status === 'wont-read' },
-		{ key: 'wishlist', label: t('status.wishlist'), pred: (b: Book) => b.copies === 0 }
+		{ key: 'reading', label: t('section.reading'), pred: (b: Book) => !isWishlist(b) && b.status === 'reading' },
+		{ key: 'to-read', label: t('status.to-read'), pred: (b: Book) => !isWishlist(b) && b.status === 'to-read' },
+		{ key: 'completed', label: t('status.completed'), pred: (b: Book) => !isWishlist(b) && b.status === 'completed' },
+		{ key: 'wont-read', label: t('status.wont-read'), pred: (b: Book) => !isWishlist(b) && b.status === 'wont-read' },
+		{ key: 'wishlist', label: t('status.wishlist'), pred: (b: Book) => isWishlist(b) }
 	]);
 	const sections = $derived(
 		sectionDefs
@@ -48,9 +48,9 @@
 	);
 
 	const statusCount = $derived(
-		(s: Status) => $books.filter((b) => b.copies > 0 && b.status === s).length
+		(s: Status) => $books.filter((b) => !isWishlist(b) && b.status === s).length
 	);
-	const wishlistCount = $derived($books.filter((b) => b.copies === 0).length);
+	const wishlistCount = $derived($books.filter(isWishlist).length);
 </script>
 
 <div class="shelf-head">

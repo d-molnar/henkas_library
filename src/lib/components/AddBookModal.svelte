@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Book } from '$lib/types';
+	import type { BookInput } from '$lib/db';
 	import { addBook, addCopy, findByIsbn } from '$lib/db';
 	import { closeModal } from '$lib/ui.svelte';
 	import { t } from '$lib/i18n/index.svelte';
@@ -7,12 +8,10 @@
 	import BookForm from './BookForm.svelte';
 	import X from 'lucide-svelte/icons/x';
 
-	type Values = Partial<Book> & Pick<Book, 'title' | 'author' | 'pages'>;
-
 	// When an ISBN already exists we pause on a confirmation step.
-	let dup = $state<{ existing: Book; values: Values } | null>(null);
+	let dup = $state<{ existing: Book; values: BookInput } | null>(null);
 
-	async function handleSubmit(values: Values) {
+	async function handleSubmit(values: BookInput) {
 		if (values.isbn) {
 			const existing = await findByIsbn(values.isbn);
 			if (existing) {

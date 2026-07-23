@@ -1,4 +1,4 @@
-import type { Book, Loan, Tag } from './types';
+import type { Book, Loan, OwnedBook, Tag } from './types';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -17,7 +17,7 @@ export interface LibraryStats {
 
 export function deriveStats(books: Book[], _loans: Loan[], tags: Tag[], now = new Date()): LibraryStats {
 	const year = now.getFullYear();
-	const owned = books.filter((b) => b.copies > 0);
+	const owned = books.filter((b): b is OwnedBook => b.owned);
 
 	const finishedThisYear = books.filter(
 		(b) => b.finishedAt && new Date(b.finishedAt).getFullYear() === year

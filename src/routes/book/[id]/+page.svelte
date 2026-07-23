@@ -3,13 +3,15 @@
 	import { goto } from '$app/navigation';
 	import type { Book } from '$lib/types';
 	import { READING_STATUSES } from '$lib/types';
+	import type { BookInput } from '$lib/db';
 	import {
 		bookById,
 		setStatus,
 		setRating,
 		updateBook,
 		addCopy,
-		deleteBook
+		deleteBook,
+		saveBookEdits
 	} from '$lib/db';
 	import { openProgress } from '$lib/ui.svelte';
 	import { tags as tagStore } from '$lib/db';
@@ -69,8 +71,8 @@
 		}
 	}
 
-	function saveEdit(values: Partial<Book> & Pick<Book, 'title' | 'author' | 'pages'>) {
-		updateBook(id, values);
+	function saveEdit(values: BookInput) {
+		saveBookEdits(id, values);
 		showEdit = false;
 	}
 </script>
@@ -99,18 +101,30 @@
 				<BookCover {book} size="lg" />
 			</div>
 
-			<div class="card">
-				<span class="card-kicker">{t('detail.inventory')}</span>
-				<div class="inv-grid">
-					<div><div class="k">{t('detail.copies')}</div><div class="v">{book.copies}</div></div>
-					<div><div class="k">{t('detail.format')}</div><div class="v">{book.format ?? '—'}</div></div>
-					<div><div class="k">{t('detail.paid')}</div><div class="v">{book.pricePaid != null ? `€${book.pricePaid.toFixed(2)}` : '—'}</div></div>
-					<div><div class="k">{t('detail.est_value')}</div><div class="v val">{book.estValue != null ? `€${book.estValue.toFixed(2)}` : '—'}</div></div>
+			{#if book.owned}
+				<div class="card">
+					<span class="card-kicker">{t('detail.inventory')}</span>
+					<div class="inv-grid">
+						<div><div class="k">{t('detail.copies')}</div><div class="v">{book.copies}</div></div>
+						<div><div class="k">{t('detail.format')}</div><div class="v">{book.format ?? '—'}</div></div>
+						<div><div class="k">{t('detail.paid')}</div><div class="v">{book.pricePaid != null ? `€${book.pricePaid.toFixed(2)}` : '—'}</div></div>
+						<div><div class="k">{t('detail.est_value')}</div><div class="v val">{book.estValue != null ? `€${book.estValue.toFixed(2)}` : '—'}</div></div>
+					</div>
+					<button class="btn btn-ghost" style="align-self:flex-start" onclick={() => addCopy(id)}>
+						<Plus size={14} strokeWidth={2.4} /> {t('detail.add_copy')}
+					</button>
 				</div>
-				<button class="btn btn-ghost" style="align-self:flex-start" onclick={() => addCopy(id)}>
-					<Plus size={14} strokeWidth={2.4} /> {t('detail.add_copy')}
-				</button>
-			</div>
+			{:else}
+				<div class="card">
+					<span class="card-kicker">{book.wanted ? t('detail.wishlist_kicker') : t('detail.not_owned_kicker')}</span>
+					<div class="inv-grid">
+						<div><div class="k">{t('detail.est_value')}</div><div class="v val">{book.estValue != null ? `€${book.estValue.toFixed(2)}` : '—'}</div></div>
+					</div>
+					<button class="btn btn-ghost" style="align-self:flex-start" onclick={() => addCopy(id)}>
+						<Plus size={14} strokeWidth={2.4} /> {t('detail.acquire')}
+					</button>
+				</div>
+			{/if}
 		</aside>
 
 		<div class="main">

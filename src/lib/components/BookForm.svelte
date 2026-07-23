@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Book, Status } from '$lib/types';
 	import { READING_STATUSES } from '$lib/types';
+	import type { BookInput } from '$lib/db';
 	import { t } from '$lib/i18n/index.svelte';
 	import { lookupIsbn } from '$lib/openlibrary';
 	import { normalizeIsbn, looksLikeIsbn } from '$lib/isbn';
@@ -11,31 +12,29 @@
 	import Search from 'lucide-svelte/icons/search';
 	import Loader from 'lucide-svelte/icons/loader-circle';
 
-	type Values = Partial<Book> & Pick<Book, 'title' | 'author' | 'pages'>;
-
 	let {
-		initial = {},
+		initial,
 		submitLabel = 'Add to shelf',
 		onsubmit
 	}: {
-		initial?: Partial<Book>;
+		initial?: Book;
 		submitLabel?: string;
-		onsubmit: (values: Values) => void;
+		onsubmit: (values: BookInput) => void;
 	} = $props();
 
 	// form fields
-	let title = $state(initial.title ?? '');
-	let author = $state(initial.author ?? '');
-	let isbn = $state(initial.isbn ?? '');
-	let pages = $state(initial.pages ? String(initial.pages) : '');
-	let status = $state<Status>(initial.status ?? 'to-read');
-	let copies = $state(initial.copies != null ? String(initial.copies) : '1');
+	let title = $state(initial?.title ?? '');
+	let author = $state(initial?.author ?? '');
+	let isbn = $state(initial?.isbn ?? '');
+	let pages = $state(initial?.pages ? String(initial.pages) : '');
+	let status = $state<Status>(initial?.status ?? 'to-read');
+	let copies = $state(initial ? (initial.owned ? String(initial.copies) : '0') : '1');
 	const isWish = $derived(Number(copies) === 0);
-	let format = $state(initial.format ?? '');
-	let price = $state(initial.pricePaid != null ? String(initial.pricePaid) : '');
-	let year = $state(initial.year ? String(initial.year) : '');
-	let publisher = $state(initial.publisher ?? '');
-	let coverImage = $state(initial.coverImage);
+	let format = $state(initial && initial.owned ? (initial.format ?? '') : '');
+	let price = $state(initial && initial.owned && initial.pricePaid != null ? String(initial.pricePaid) : '');
+	let year = $state(initial?.year ? String(initial.year) : '');
+	let publisher = $state(initial?.publisher ?? '');
+	let coverImage = $state(initial?.coverImage);
 
 	// Genres and labels are both tag references; split the book's tagIds by kind
 	// once the tag store has loaded (so we know each id's kind).
@@ -44,7 +43,7 @@
 	let splitDone = $state(false);
 	$effect(() => {
 		if (splitDone) return;
-		const initialTags = initial.tagIds ?? [];
+		const initialTags = initial?.tagIds ?? [];
 		if (initialTags.length === 0) {
 			splitDone = true;
 			return;
@@ -103,17 +102,20 @@
 	function submit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!canSubmit) return;
+		const wish = Number(copies) === 0;
 		onsubmit({
 			title: title.trim(),
 			author: author.trim() || 'Unknown',
 			pages: Number(pages),
 			status,
+			currentPage: initial?.currentPage,
 			copies: Math.max(0, Math.floor(Number(copies) || 0)),
 			isbn: normalizeIsbn(isbn) ?? undefined,
-			format: format.trim() || undefined,
+			format: wish ? undefined : format.trim() || undefined,
 			year: year ? Number(year) : undefined,
 			publisher: publisher.trim() || undefined,
-			pricePaid: price ? Number(price) : undefined,
+			pricePaid: wish ? undefined : price ? Number(price) : undefined,
+			estValue: initial?.estValue,
 			tagIds: [...genreIds, ...labelIds],
 			coverImage
 		});
@@ -202,20 +204,24 @@
 	</div>
 
 	<div class="two">
-		<div class="field">
-			<label for="format">{t('form.format')}</label>
-			<input id="format" class="input" bind:value={format} placeholder={t('form.format_ph')} />
-		</div>
+		{#if !isWish}
+			<div class="field">
+				<label for="format">{t('form.format')}</label>
+				<input id="format" class="input" bind:value={format} placeholder={t('form.format_ph')} />
+			</div>
+		{/if}
 		<div class="field">
 			<label for="year">{t('form.year')}</label>
 			<input id="year" class="input" type="number" bind:value={year} placeholder="2015" />
 		</div>
 	</div>
 
-	<div class="field">
-		<label for="price">{t('form.price')}</label>
-		<input id="price" class="input" type="number" step="0.01" bind:value={price} placeholder="€ 0.00" />
-	</div>
+	{#if !isWish}
+		<div class="field">
+			<label for="price">{t('form.price')}</label>
+			<input id="price" class="input" type="number" step="0.01" bind:value={price} placeholder="€ 0.00" />
+		</div>
+	{/if}
 
 	<div class="field">
 		<span class="lbl">{t('form.tags')}</span>
