@@ -1,12 +1,13 @@
 import Dexie, { liveQuery, type Table } from 'dexie';
 import { readable, type Readable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Book, Loan, Series, Tag } from './types';
-import { seedBooks, seedLoans, seedSeries, seedTags } from './seed';
+import type { Book, Loan, Series, Tag, SeriesEntry } from './types';
+import { seedBooks, seedLoans, seedSeries, seedSeriesEntries, seedTags } from './seed';
 
 class HenkaDB extends Dexie {
 	books!: Table<Book, string>;
 	series!: Table<Series, string>;
+	seriesEntries!: Table<SeriesEntry, string>;
 	loans!: Table<Loan, string>;
 	tags!: Table<Tag, string>;
 
@@ -49,6 +50,21 @@ class HenkaDB extends Dexie {
 				await tx.table('series').clear();
 				await tx.table('loans').clear();
 			});
+		// v4 — series volumes become first-class entities (ADR 0009). Books link to
+		// entries via entryIds; seriesId/seriesIndex removed. Pre-release: clear+reseed.
+		this.version(4)
+			.stores({
+				books: 'id, status, addedAt, finishedAt, isbn',
+				series: 'id',
+				seriesEntries: 'id, seriesId, ordinal',
+				loans: 'id, bookId, returnedAt',
+				tags: 'id, kind'
+			})
+			.upgrade(async (tx) => {
+				await tx.table('books').clear();
+				await tx.table('series').clear();
+				await tx.table('loans').clear();
+			});
 	}
 }
 
@@ -63,10 +79,11 @@ export async function ensureSeeded(): Promise<void> {
 		seedPromise = (async () => {
 			const count = await db.books.count();
 			if (count === 0) {
-				await db.transaction('rw', db.books, db.series, db.loans, db.tags, async () => {
+				await db.transaction('rw', db.books, db.series, db.seriesEntries, db.loans, db.tags, async () => {
 					await db.tags.bulkAdd(seedTags);
 					await db.books.bulkAdd(seedBooks);
 					await db.series.bulkAdd(seedSeries);
+					await db.seriesEntries.bulkAdd(seedSeriesEntries);
 					await db.loans.bulkAdd(seedLoans);
 				});
 			}

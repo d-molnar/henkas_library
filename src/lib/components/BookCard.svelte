@@ -39,7 +39,6 @@
 	{:else if book.rating}
 		<div class="meta">
 			<StarRating value={book.rating} readonly size={12} />
-			{#if book.seriesIndex}<span class="dim">#{book.seriesIndex}</span>{/if}
 		</div>
 	{:else}
 		<div class="meta"><span class="dim">{book.author}</span></div>
