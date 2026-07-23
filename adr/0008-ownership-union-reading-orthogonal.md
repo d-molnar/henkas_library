@@ -71,9 +71,13 @@ history** — losing your last copy of a book you finished keeps it `completed`.
 
 ## Consequences
 
-- **Illegal states gone:** `copies: 0` is unrepresentable (not-owning is a
-  different shape); "owned *and* wished" is unrepresentable (`wanted` exists only
-  on the unowned variant); reading is never gated by ownership.
+- **Illegal states gone:** not-owning is now a *distinct shape* — `copies: 0` no
+  longer means "wishlist," that state is `{ owned: false, … }`. (The count itself
+  isn't type-branded to ≥1, so `{ owned: true, copies: 0 }` still *type*-checks;
+  the builders — `buildBook`/`withCopies`/seed `make` — hold `copies ≥ 1` at
+  runtime. Brand the count later if the compiler should carry it.) "Owned *and*
+  wished" **is** statically unrepresentable — `wanted` exists only on the unowned
+  variant. Reading is never gated by ownership.
 - **New coherent state:** `{ owned:false, wanted:false, status:'completed' }` —
   "read it elsewhere, don't own it, don't need it" — which 0004 could not express.
 - Consumers must **narrow on `owned`** before reading `copies`/`format`/`pricePaid`
