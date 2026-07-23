@@ -146,10 +146,10 @@ function coreFromInput(input: BookInput, base: Pick<BookCore, 'id' | 'cover' | '
 	};
 }
 
-function buildBook(coreFields: BookCore, copies: number, input: BookInput): Book {
+function buildBook(coreFields: BookCore, copies: number, input: BookInput, wantedWhenUnowned = true): Book {
 	return copies >= 1
 		? { ...coreFields, owned: true, copies, format: input.format, pricePaid: input.pricePaid, estValue: input.estValue }
-		: { ...coreFields, owned: false, wanted: true, estValue: input.estValue };
+		: { ...coreFields, owned: false, wanted: wantedWhenUnowned, estValue: input.estValue };
 }
 
 export async function addBook(input: BookInput): Promise<string> {
@@ -178,7 +178,8 @@ export async function saveBookEdits(id: string, input: BookInput): Promise<void>
 		finishedAt: existing.finishedAt,
 		rating: existing.rating
 	};
-	await db.books.put(buildBook(coreFields, copies, input));
+	const wantedWhenUnowned = existing.owned ? false : existing.wanted;
+	await db.books.put(buildBook(coreFields, copies, input, wantedWhenUnowned));
 }
 
 // ── Tags ──────────────────────────────────────────────────────────────
