@@ -28,6 +28,11 @@ inside today's file layout.
 - `src/routes/book/[id]/+page.svelte` — detail: copies, add-copy, inventory, status.
 - `src/lib/components/BookCard.svelte`, `src/lib/stats.ts` — read copies/status.
 
+## Plan
+
+Step-by-step implementation plan (TDD for the pure transition logic):
+`docs/superpowers/plans/2026-07-23-ownership-union-refactor.md`.
+
 ## Approach
 
 1. **types.ts** — define the union per ADR 0008:
