@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { books } from '$lib/db';
+	import { books } from '$lib/books';
 	import { tags as tagStore, renameTag, deleteTag, mergeTags } from '$lib/tags';
 	import { t } from '$lib/i18n/index.svelte';
 	import type { Tag, TagKind } from '$lib/types';

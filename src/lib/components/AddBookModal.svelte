@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Book } from '$lib/types';
-	import type { BookInput } from '$lib/db';
-	import { addBook, addCopy, findByIsbn } from '$lib/db';
+	import type { BookInput } from '$lib/books';
+	import { addBook, addCopy, findByIsbn } from '$lib/books';
 	import { closeModal } from '$lib/ui.svelte';
 	import { t } from '$lib/i18n/index.svelte';
 	import Modal from './Modal.svelte';

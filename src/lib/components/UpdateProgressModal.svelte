@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bookById, updateProgress, markFinished, updateBook } from '$lib/db';
+	import { bookById, updateProgress, markFinished, updateBook } from '$lib/books';
 	import { closeModal } from '$lib/ui.svelte';
 	import { t } from '$lib/i18n/index.svelte';
 	import Modal from './Modal.svelte';
