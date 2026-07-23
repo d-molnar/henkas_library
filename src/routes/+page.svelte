@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { books, tags as tagStore } from '$lib/db';
+	import { books } from '$lib/books';
+	import { tags as tagStore } from '$lib/tags';
 	import { openAdd } from '$lib/ui.svelte';
 	import { t } from '$lib/i18n/index.svelte';
 	import type { Book, Status } from '$lib/types';

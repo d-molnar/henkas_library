@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { books, tags as tagStore, renameTag, deleteTag, mergeTags } from '$lib/db';
+	import { books } from '$lib/books';
+	import { tags as tagStore, renameTag, deleteTag, mergeTags } from '$lib/tags';
 	import { t } from '$lib/i18n/index.svelte';
 	import type { Tag, TagKind } from '$lib/types';
 	import Trash2 from 'lucide-svelte/icons/trash-2';

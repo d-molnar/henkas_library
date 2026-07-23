@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Tag, TagKind } from '$lib/types';
-	import { tags as tagStore, ensureTag } from '$lib/db';
+	import { tags as tagStore, ensureTag } from '$lib/tags';
 	import X from 'lucide-svelte/icons/x';
 
 	let {

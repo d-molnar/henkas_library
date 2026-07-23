@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { Book } from '$lib/types';
 	import { READING_STATUSES } from '$lib/types';
-	import type { BookInput } from '$lib/db';
+	import type { BookInput } from '$lib/books';
 	import {
 		bookById,
 		setStatus,
@@ -12,9 +12,9 @@
 		addCopy,
 		deleteBook,
 		saveBookEdits
-	} from '$lib/db';
+	} from '$lib/books';
 	import { openProgress } from '$lib/ui.svelte';
-	import { tags as tagStore } from '$lib/db';
+	import { tags as tagStore } from '$lib/tags';
 	import { t, formatDate } from '$lib/i18n/index.svelte';
 	import BookCover from '$lib/components/BookCover.svelte';
 	import ProgressBar from '$lib/components/ProgressBar.svelte';

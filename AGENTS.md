@@ -39,7 +39,12 @@ src/
     types.ts                  BookCore, OwnedBook, WishedBook, Book (union), Tag, Series, Loan,
                               Status; isOwned/isWishlist guards
     ownership.ts              pure ownership transitions (withCopies/acquired/withWanted), unit-tested
-    db.ts                     Dexie schema, seeding, reactive liveQuery stores, ALL mutations
+    db.ts                     shared infra ONLY: HenkaDB Dexie schema/instance, ensureSeeded, live() store helper
+    books.ts                  books store + bookById + BookInput + all books-table mutations (add/edit, reading, ownership)
+    lending.ts                loans/activeLoans stores + lendBook/returnLoan (lending → books; never the reverse)
+    tags.ts                   tags store + ensureTag/renameTag/deleteTag/mergeTags
+    series.ts                 series store
+    backup.ts                 exportBackup/importBackup (spans books+series+loans)
     seed.ts                   starter library + seed tags/series/loans
     covers.ts                 gradient book-cover palettes (coverFor)
     isbn.ts                   ISBN validate/normalize to ISBN-13
@@ -78,7 +83,7 @@ src/
 - **Pure transitions live in `ownership.ts`**: `withCopies`, `acquired`,
   `withWanted` rebuild the correct variant while preserving `BookCore` fields;
   they're unit-tested in `ownership.test.ts`. Dexie mutations (`setCopies`,
-  `addCopy`, `setWanted` in `db.ts`) call these and `put()` the rebuilt row
+  `addCopy`, `setWanted` in `books.ts`) call these and `put()` the rebuilt row
   rather than `update()`-patching fields onto the wrong variant.
 - **Tags are entities** (`tags` table): `{ id, name, kind: 'genre' | 'label' }`.
   Books reference **`tagIds`**. Genres are simply tags with `kind: 'genre'`.
@@ -89,10 +94,12 @@ src/
 
 - **All user-facing strings go through `t()`** (`$lib/i18n/index.svelte`). Add the
   key to `en.ts` first (it types `MessageKey`), then `sk.ts`. Never hard-code copy.
-- **Reactivity**: read data from the `liveQuery` stores exported by `db.ts`
-  (`books`, `tags`, `series`, `loans`, `activeLoans`, `bookById(id)`). Mutations
-  are the exported async functions in `db.ts` — don't touch `db.*` tables from
-  components.
+- **Reactivity**: read data from the `liveQuery` stores exported by the domain
+  modules — `books`/`bookById(id)` from `books.ts`, `tags` from `tags.ts`,
+  `series` from `series.ts`, `loans`/`activeLoans` from `lending.ts`. Mutations
+  are the exported async functions in those same modules — don't touch `db.*`
+  tables from components. `db.ts` holds only the shared schema/instance,
+  `ensureSeeded`, and the `live()` helper.
 - **Styling**: prefer the Organic classes already in `app.css`
   (`.btn/.card/.tag/.seg/.input/.dialog/.table/.nav` + tokens `--color-*`,
   `--space-*`, `--radius-*`). Component-scoped `<style>` for layout glue only.

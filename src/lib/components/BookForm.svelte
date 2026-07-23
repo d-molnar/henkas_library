@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Book, Status } from '$lib/types';
 	import { READING_STATUSES } from '$lib/types';
-	import type { BookInput } from '$lib/db';
+	import type { BookInput } from '$lib/books';
 	import { t } from '$lib/i18n/index.svelte';
 	import { lookupIsbn } from '$lib/openlibrary';
 	import { normalizeIsbn, looksLikeIsbn } from '$lib/isbn';
-	import { tags as tagStore, ensureTag } from '$lib/db';
+	import { tags as tagStore, ensureTag } from '$lib/tags';
 	import TagPicker from './TagPicker.svelte';
 	import BookCover from './BookCover.svelte';
 	import { coverFor } from '$lib/covers';
