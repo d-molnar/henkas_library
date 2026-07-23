@@ -40,3 +40,11 @@ export function withWanted(b: Book, wanted: boolean): Book {
 	if (b.owned) return b;
 	return { ...b, wanted };
 }
+
+/** The `wanted` flag to apply when an EDIT leaves a book unowned: an owned
+ *  book edited to zero copies was given away (not wished); an already-unowned
+ *  book keeps its existing wish. (Distinct from `withCopies`, which always
+ *  clears `wanted` on 0 copies.) */
+export function wantedAfterEdit(existing: Book): boolean {
+	return existing.owned ? false : existing.wanted;
+}

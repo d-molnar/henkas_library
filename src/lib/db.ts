@@ -5,7 +5,7 @@ import type { Book, BookCore, Loan, Series, Status, Tag, TagKind } from './types
 import { seedBooks, seedLoans, seedSeries, seedTags } from './seed';
 import { coverFor } from './covers';
 import { normalizeIsbn } from './isbn';
-import { withCopies, acquired, withWanted } from './ownership';
+import { withCopies, acquired, withWanted, wantedAfterEdit } from './ownership';
 
 class HenkaDB extends Dexie {
 	books!: Table<Book, string>;
@@ -178,7 +178,7 @@ export async function saveBookEdits(id: string, input: BookInput): Promise<void>
 		finishedAt: existing.finishedAt,
 		rating: existing.rating
 	};
-	const wantedWhenUnowned = existing.owned ? false : existing.wanted;
+	const wantedWhenUnowned = wantedAfterEdit(existing);
 	await db.books.put(buildBook(coreFields, copies, input, wantedWhenUnowned));
 }
 

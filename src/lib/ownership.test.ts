@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Book, OwnedBook, WishedBook } from './types';
-import { withCopies, acquired, withWanted } from './ownership';
+import { withCopies, acquired, withWanted, wantedAfterEdit } from './ownership';
 
 const owned = (over: Partial<OwnedBook> = {}): OwnedBook => ({
 	id: 'b1', title: 'T', author: 'A', pages: 300, tagIds: [],
@@ -58,6 +58,18 @@ describe('acquired', () => {
 		expect(r.status).toBe('completed');
 		expect(r.currentPage).toBe(200);
 		expect('wanted' in r).toBe(false);
+	});
+});
+
+describe('wantedAfterEdit', () => {
+	it('an owned book edited to 0 copies was given away, not wished', () => {
+		expect(wantedAfterEdit(owned())).toBe(false);
+	});
+	it('an existing wish stays a wish', () => {
+		expect(wantedAfterEdit(wished({ wanted: true }))).toBe(true);
+	});
+	it('a read-elsewhere record stays not-wanted', () => {
+		expect(wantedAfterEdit(wished({ wanted: false }))).toBe(false);
 	});
 });
 
