@@ -92,11 +92,6 @@ export function live<T>(query: () => T | Promise<T>, initial: T): Readable<T> {
 
 // ── Reactive collections ──────────────────────────────────────────────
 export const books = live<Book[]>(() => db.books.toArray(), []);
-export const loans = live<Loan[]>(() => db.loans.toArray(), []);
-export const activeLoans = live<Loan[]>(
-	() => db.loans.filter((l) => l.returnedAt == null).toArray(),
-	[]
-);
 
 export function bookById(id: string): Readable<Book | undefined> {
 	return live<Book | undefined>(() => db.books.get(id), undefined);
@@ -247,20 +242,6 @@ export async function addCopy(id: string) {
 	const b = await db.books.get(id);
 	if (!b) return;
 	await db.books.put(acquired(b));
-}
-
-export async function lendBook(bookId: string, loan: Omit<Loan, 'id' | 'bookId' | 'since' | 'returnedAt'> & { since?: number }) {
-	await db.loans.add({
-		id: crypto.randomUUID(),
-		bookId,
-		since: loan.since ?? Date.now(),
-		returnedAt: null,
-		...loan
-	});
-}
-
-export async function returnLoan(loanId: string) {
-	await db.loans.update(loanId, { returnedAt: Date.now() });
 }
 
 export async function deleteBook(id: string) {
