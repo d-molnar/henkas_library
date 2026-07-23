@@ -27,7 +27,7 @@ requirement. Every feature must work offline.
 - No CSS framework: the design system is hand-ported CSS (see below).
 
 Commands: `npm run dev` · `npm run build` · `npm run check` (svelte-check).
-Keep `npm run check` at **0 errors** before ending a task. The ~17 "captures the
+Keep `npm run check` at **0 errors** before ending a task. The ~22 "captures the
 initial value" warnings in forms are expected (one-time seeds).
 
 ## Layout
@@ -36,7 +36,9 @@ initial value" warnings in forms are expected (one-time seeds).
 src/
   app.css                     Organic design system (tokens + component classes) + app helpers
   lib/
-    types.ts                  Book, Tag, Series, Loan, Status; isOwned/isWishlist helpers
+    types.ts                  BookCore, OwnedBook, WishedBook, Book (union), Tag, Series, Loan,
+                              Status; isOwned/isWishlist guards
+    ownership.ts              pure ownership transitions (withCopies/acquired/withWanted), unit-tested
     db.ts                     Dexie schema, seeding, reactive liveQuery stores, ALL mutations
     seed.ts                   starter library + seed tags/series/loans
     covers.ts                 gradient book-cover palettes (coverFor)
@@ -56,14 +58,28 @@ src/
     book/[id]/+page.svelte    book detail + inline edit (screen 1b)
 ```
 
-## Data model (important — see ADRs 0004–0006)
+## Data model (important — see ADRs 0004–0006, 0008)
 
 - **Identity is a UUID** (`Book.id`). ISBN is an optional, normalized (ISBN-13),
   indexed *attribute* used for lookup/dedup — never identity.
-- **Ownership is derived from `copies`**: `copies > 0` = owned; `copies === 0` =
-  wishlist. There is no `owned` flag and no toggle. Helpers: `isOwned`, `isWishlist`.
-- **Reading status** is `reading | to-read | completed | wont-read` (wishlist is
-  NOT a status — it's the zero-copies state).
+- **Ownership is a discriminated union** (ADR 0008): `Book = OwnedBook | WishedBook`
+  over a shared `BookCore`. `OwnedBook` has `owned: true` and `copies: number`
+  (always ≥ 1); `WishedBook` has `owned: false` and `wanted: boolean`. Owned-and-
+  wanted and zero-copies-owned are unrepresentable by construction — no more
+  `copies === 0` standing in for "wishlist". Narrow with `book.owned`, or use the
+  `isOwned` (`b is OwnedBook`) / `isWishlist` (`!owned && wanted`) guards from
+  `types.ts`. `owned` is stored on every row but is **not** an indexed Dexie field
+  (booleans aren't valid IndexedDB keys).
+- **Reading is orthogonal to ownership**: `status`, `currentPage`, `startedAt`,
+  `finishedAt`, `rating` live on `BookCore` and apply whether or not you own a
+  copy (e.g. a book read at a library: `owned: false, wanted: false, status:
+  'completed'`). **Reading status** itself is `reading | to-read | completed |
+  wont-read` (wishlist is not a status — it's the unowned+wanted state).
+- **Pure transitions live in `ownership.ts`**: `withCopies`, `acquired`,
+  `withWanted` rebuild the correct variant while preserving `BookCore` fields;
+  they're unit-tested in `ownership.test.ts`. Dexie mutations (`setCopies`,
+  `addCopy`, `setWanted` in `db.ts`) call these and `put()` the rebuilt row
+  rather than `update()`-patching fields onto the wrong variant.
 - **Tags are entities** (`tags` table): `{ id, name, kind: 'genre' | 'label' }`.
   Books reference **`tagIds`**. Genres are simply tags with `kind: 'genre'`.
   Rename a tag in one place (`renameTag`) and every book follows. This is what
@@ -100,8 +116,8 @@ That changes several defaults:
 - **Reset local data freely.** The IndexedDB database is named **`henkas-lib`**.
   To reset: clear site data in devtools (Application → Storage), or bump the Dexie
   version in `db.ts`. Seed data lives in `src/lib/seed.ts` — edit it liberally.
-- **The data model is settled** as of this writing (ADRs 0004–0006). If you change
-  it, write/supersede an ADR; don't just mutate types silently.
+- **The data model is settled** as of this writing (ADRs 0004–0006, 0008). If you
+  change it, write/supersede an ADR; don't just mutate types silently.
 
 ## Other context for a fresh session
 
@@ -126,4 +142,6 @@ That changes several defaults:
 
 Built & working: shelf, book detail + inline edit, add/edit (manual + ISBN
 lookup + duplicate handling), update-progress, tags/genres as entities,
-i18n (en/sk), ownership-by-copies. Everything else is tracked in `tasks/`.
+i18n (en/sk), ownership as a discriminated union (`OwnedBook | WishedBook`,
+ADR 0008), a Vitest suite for the pure `ownership.ts` transitions. Everything
+else is tracked in `tasks/`.

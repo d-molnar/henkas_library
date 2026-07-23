@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Book } from '$lib/types';
+	import { isWishlist } from '$lib/types';
 	import { t } from '$lib/i18n/index.svelte';
 	import BookCover from './BookCover.svelte';
 	import ProgressBar from './ProgressBar.svelte';
@@ -12,10 +13,10 @@
 <a class="bookcard" href="/book/{book.id}">
 	<div class="cover-wrap">
 		<BookCover {book} size="md" />
-		{#if book.copies > 1}
+		{#if book.owned && book.copies > 1}
 			<span class="badge">×{book.copies}</span>
 		{/if}
-		{#if book.copies === 0}
+		{#if isWishlist(book)}
 			<span class="badge wish">{t('status.wishlist')}</span>
 		{/if}
 	</div>
@@ -26,7 +27,7 @@
 
 	<div class="title">{book.title}</div>
 
-	{#if book.copies === 0}
+	{#if !book.owned}
 		<div class="meta">
 			<span>{book.estValue ? t('common.unowned_price', { price: book.estValue }) : t('common.unowned')}</span>
 		</div>

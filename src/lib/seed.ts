@@ -1,4 +1,4 @@
-import type { Book, Loan, Series, Tag } from './types';
+import type { Book, BookCore, Loan, Series, Status, Tag } from './types';
 import { coverFor } from './covers';
 
 /** 2026 timestamps helper */
@@ -26,18 +26,45 @@ const resolve = (names: string[] = []): string[] =>
 	names.map((n) => tagIdByName.get(n.toLowerCase())).filter((id): id is string => Boolean(id));
 
 // Authoring convenience: seeds list genre + label names; we resolve to tag ids.
-type Seed = Omit<Partial<Book>, 'tagIds'> &
-	Pick<Book, 'title' | 'author' | 'status' | 'pages'> & { genres?: string[]; labels?: string[] };
+type Seed = {
+	title: string;
+	author: string;
+	status: Status;
+	pages: number;
+	currentPage?: number;
+	rating?: number;
+	copies?: number; // default 1; 0 => wishlist
+	wanted?: boolean; // only consulted when copies === 0 (default true)
+	genres?: string[];
+	labels?: string[];
+	notes?: string;
+	format?: string;
+	pricePaid?: number;
+	estValue?: number;
+	year?: number;
+	publisher?: string;
+	isbn?: string;
+	seriesId?: string;
+	seriesIndex?: number;
+	startedAt?: number;
+	finishedAt?: number;
+	addedAt?: number;
+	coverImage?: string;
+};
 
-const make = ({ genres, labels, ...s }: Seed): Book => ({
-	id: crypto.randomUUID(),
-	currentPage: 0,
-	copies: 1,
-	cover: coverFor(s.title),
-	addedAt: d(2026, 1, 1),
-	tagIds: [...resolve(genres), ...resolve(labels)],
-	...s
-});
+const make = ({ genres, labels, copies = 1, wanted, format, pricePaid, estValue, ...s }: Seed): Book => {
+	const base: BookCore = {
+		id: crypto.randomUUID(),
+		...s,
+		currentPage: s.currentPage ?? 0,
+		cover: coverFor(s.title),
+		addedAt: s.addedAt ?? d(2026, 1, 1),
+		tagIds: [...resolve(genres), ...resolve(labels)]
+	};
+	return copies >= 1
+		? { ...base, owned: true, copies, format, pricePaid, estValue }
+		: { ...base, owned: false, wanted: wanted ?? true, estValue };
+};
 
 const raw: Seed[] = [
 	// ── Reading now ──
@@ -154,6 +181,9 @@ const raw: Seed[] = [
 	},
 	{ title: 'The Overstory', author: 'Richard Powers', status: 'to-read', copies: 0, pages: 502, estValue: 16, genres: ['Nature'] },
 	{ title: 'Babel', author: 'R. F. Kuang', status: 'to-read', copies: 0, pages: 546, estValue: 20, genres: ['Fantasy'] },
+
+	// ── Read elsewhere, not owned (not wanted — already read it) ──
+	{ title: 'The Dispossessed', author: 'Ursula K. Le Guin', status: 'completed', pages: 387, currentPage: 387, rating: 5, copies: 0, wanted: false, genres: ['Sci-fi'], finishedAt: d(2026, 6, 20) },
 
 	// ── Won't read (owned but set aside) ──
 	{ title: 'Infinite Jest', author: 'David Foster Wallace', status: 'wont-read', pages: 1079, genres: ['Literary'], format: 'Paperback', pricePaid: 18, estValue: 16 },

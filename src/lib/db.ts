@@ -1,10 +1,11 @@
 import Dexie, { liveQuery, type Table } from 'dexie';
 import { readable, type Readable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Book, Loan, Series, Status, Tag, TagKind } from './types';
+import type { Book, BookCore, Loan, Series, Status, Tag, TagKind } from './types';
 import { seedBooks, seedLoans, seedSeries, seedTags } from './seed';
 import { coverFor } from './covers';
 import { normalizeIsbn } from './isbn';
+import { withCopies, acquired, withWanted } from './ownership';
 
 class HenkaDB extends Dexie {
 	books!: Table<Book, string>;
@@ -25,6 +26,21 @@ class HenkaDB extends Dexie {
 		// The data model changed enough that a clean reseed is the honest migration
 		// for this prototype: clear the old rows so ensureSeeded() repopulates.
 		this.version(2)
+			.stores({
+				books: 'id, status, seriesId, addedAt, finishedAt, isbn',
+				series: 'id',
+				loans: 'id, bookId, returnedAt',
+				tags: 'id, kind'
+			})
+			.upgrade(async (tx) => {
+				await tx.table('books').clear();
+				await tx.table('series').clear();
+				await tx.table('loans').clear();
+			});
+		// v3 — ownership becomes a discriminated union (ADR 0008). Pre-release: clear
+		// and reseed rather than migrate. `owned` is stored but not indexed (booleans
+		// aren't valid IndexedDB keys).
+		this.version(3)
 			.stores({
 				books: 'id, status, seriesId, addedAt, finishedAt, isbn',
 				series: 'id',
@@ -89,21 +105,80 @@ export function bookById(id: string): Readable<Book | undefined> {
 }
 
 // ── Mutations ─────────────────────────────────────────────────────────
-export async function addBook(input: Partial<Book> & Pick<Book, 'title' | 'author' | 'pages'>) {
-	const book: Book = {
-		id: crypto.randomUUID(),
-		status: 'to-read',
-		currentPage: 0,
-		tagIds: [],
-		copies: 1,
-		cover: coverFor(input.title),
-		addedAt: Date.now(),
-		...input,
-		// Always store ISBN normalized (ISBN-13 digits) so lookups match.
-		isbn: normalizeIsbn(input.isbn) ?? undefined
+export interface BookInput {
+	title: string;
+	author: string;
+	pages: number;
+	status: Status;
+	currentPage?: number;
+	copies: number; // >= 1 owned; 0 => wishlist (wanted)
+	isbn?: string;
+	year?: number;
+	publisher?: string;
+	format?: string;
+	pricePaid?: number;
+	estValue?: number;
+	tagIds?: string[];
+	coverImage?: string;
+	seriesId?: string;
+	seriesIndex?: number;
+	rating?: number;
+	notes?: string;
+}
+
+function coreFromInput(input: BookInput, base: Pick<BookCore, 'id' | 'cover' | 'addedAt'>): BookCore {
+	return {
+		...base,
+		title: input.title,
+		author: input.author,
+		pages: input.pages,
+		status: input.status,
+		currentPage: input.currentPage ?? 0,
+		tagIds: input.tagIds ?? [],
+		coverImage: input.coverImage,
+		isbn: normalizeIsbn(input.isbn) ?? undefined,
+		year: input.year,
+		publisher: input.publisher,
+		seriesId: input.seriesId,
+		seriesIndex: input.seriesIndex,
+		rating: input.rating,
+		notes: input.notes
 	};
+}
+
+function buildBook(coreFields: BookCore, copies: number, input: BookInput): Book {
+	return copies >= 1
+		? { ...coreFields, owned: true, copies, format: input.format, pricePaid: input.pricePaid, estValue: input.estValue }
+		: { ...coreFields, owned: false, wanted: true, estValue: input.estValue };
+}
+
+export async function addBook(input: BookInput): Promise<string> {
+	const copies = Math.max(0, Math.floor(input.copies));
+	const coreFields = coreFromInput(input, {
+		id: crypto.randomUUID(),
+		cover: coverFor(input.title),
+		addedAt: Date.now()
+	});
+	const book = buildBook(coreFields, copies, input);
 	await db.books.add(book);
 	return book.id;
+}
+
+/** Save edits from the book form. Rebuilds the ownership variant from
+ *  input.copies while preserving reading progress not exposed by the form
+ *  (currentPage, startedAt, finishedAt, rating). */
+export async function saveBookEdits(id: string, input: BookInput): Promise<void> {
+	const existing = await db.books.get(id);
+	if (!existing) return;
+	const copies = Math.max(0, Math.floor(input.copies));
+	const coreFields: BookCore = {
+		...coreFromInput(input, { id: existing.id, cover: existing.cover, addedAt: existing.addedAt }),
+		currentPage: existing.currentPage,
+		startedAt: existing.startedAt,
+		finishedAt: existing.finishedAt,
+		rating: existing.rating
+	};
+	await db.books.put(buildBook(coreFields, copies, input));
 }
 
 // ── Tags ──────────────────────────────────────────────────────────────
@@ -161,7 +236,7 @@ export async function findByIsbn(rawIsbn: string): Promise<Book | undefined> {
 	return db.books.where('isbn').equals(norm).first();
 }
 
-export async function updateBook(id: string, patch: Partial<Book>) {
+export async function updateBook(id: string, patch: Partial<BookCore>) {
 	await db.books.update(id, patch);
 }
 
@@ -177,9 +252,18 @@ export async function setStatus(id: string, status: Status) {
 	await db.books.update(id, patch);
 }
 
-/** Set the number of owned copies. 0 turns the book into a wishlist item. */
-export async function setCopies(id: string, copies: number) {
-	await db.books.update(id, { copies: Math.max(0, Math.floor(copies)) });
+/** Set owned copies. 0 turns the book into an unowned (not-wanted) record. */
+export async function setCopies(id: string, n: number) {
+	const b = await db.books.get(id);
+	if (!b) return;
+	await db.books.put(withCopies(b, n));
+}
+
+/** Mark an unowned book as wanted / not-wanted (wishlist toggle). No-op if owned. */
+export async function setWanted(id: string, wanted: boolean) {
+	const b = await db.books.get(id);
+	if (!b) return;
+	await db.books.put(withWanted(b, wanted));
 }
 
 export async function setRating(id: string, rating: number) {
@@ -207,10 +291,11 @@ export async function markFinished(id: string) {
 	});
 }
 
+/** Add a copy (or acquire an unowned book). */
 export async function addCopy(id: string) {
 	const b = await db.books.get(id);
 	if (!b) return;
-	await db.books.update(id, { copies: b.copies + 1 });
+	await db.books.put(acquired(b));
 }
 
 export async function lendBook(bookId: string, loan: Omit<Loan, 'id' | 'bookId' | 'since' | 'returnedAt'> & { since?: number }) {

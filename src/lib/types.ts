@@ -1,23 +1,13 @@
-/**
- * Reading status applies to a book regardless of whether you own it. Ownership
- * is derived from `Book.copies`: 0 copies means it's a wishlist item (see
- * isOwned / isWishlist below).
- */
 export type Status = 'reading' | 'to-read' | 'completed' | 'wont-read';
+export const READING_STATUSES: Status[] = ['reading', 'to-read', 'completed', 'wont-read'];
 
-/** A cover is a two-stop gradient plus the ink colors printed on it. */
 export interface Cover {
 	from: string;
 	to: string;
-	ink: string; // title colour
-	sub: string; // author/subtitle colour
+	ink: string;
+	sub: string;
 }
 
-/**
- * Tags are entities with a stable id and a renameable display name — books
- * reference them by id so a rename (or, later, a translation) propagates
- * everywhere. Genres are just tags with kind 'genre'.
- */
 export type TagKind = 'genre' | 'label';
 export interface Tag {
 	id: string;
@@ -25,31 +15,49 @@ export interface Tag {
 	kind: TagKind;
 }
 
-export interface Book {
+/** Fields intrinsic to the work + the reading axis — present on every book,
+ *  independent of ownership (you can read a book you don't own). */
+export interface BookCore {
 	id: string;
 	title: string;
 	author: string;
-	status: Status;
 	pages: number;
-	currentPage: number;
-	rating?: number; // 0–5
-	tagIds: string[]; // references into the tags table (genres + labels alike)
+	isbn?: string;
+	year?: number;
+	publisher?: string;
+	seriesId?: string;
+	seriesIndex?: number;
+	tagIds: string[];
 	notes?: string;
+	cover: Cover;
+	coverImage?: string;
+	addedAt: number;
+	// reading axis
+	status: Status;
+	currentPage: number;
+	startedAt?: number;
+	finishedAt?: number;
+	rating?: number;
+}
+
+export interface OwnedBook extends BookCore {
+	owned: true;
+	copies: number; // always >= 1
 	format?: string;
 	pricePaid?: number;
 	estValue?: number;
-	copies: number;
-	cover: Cover;
-	coverImage?: string; // real cover URL (e.g. from Open Library); falls back to the gradient
-	year?: number;
-	publisher?: string;
-	isbn?: string;
-	seriesId?: string;
-	seriesIndex?: number;
-	addedAt: number;
-	startedAt?: number;
-	finishedAt?: number;
 }
+
+export interface WishedBook extends BookCore {
+	owned: false;
+	wanted: boolean; // true => wishlist item
+	estValue?: number;
+}
+
+export type Book = OwnedBook | WishedBook;
+
+export const isOwned = (b: Book): b is OwnedBook => b.owned;
+export const isWishlist = (b: Book): boolean => !b.owned && b.wanted;
 
 export interface Series {
 	id: string;
@@ -68,10 +76,3 @@ export interface Loan {
 	since: number;
 	returnedAt?: number | null;
 }
-
-export const READING_STATUSES: Status[] = ['reading', 'to-read', 'completed', 'wont-read'];
-
-/** Ownership is derived: you own the book if you have at least one copy. */
-export const isOwned = (b: Pick<Book, 'copies'>): boolean => b.copies > 0;
-/** A book with zero copies is a wishlist item — it's only in the library because you want it. */
-export const isWishlist = (b: Pick<Book, 'copies'>): boolean => b.copies === 0;

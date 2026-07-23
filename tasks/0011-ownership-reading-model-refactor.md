@@ -1,7 +1,7 @@
 ---
 id: 0011
 title: Refactor ownership into a discriminated union (reading orthogonal)
-state: todo
+state: done
 module: lib/types + lib/db + shelf/detail/form
 created: 2026-07-23
 updated: 2026-07-23
@@ -69,14 +69,49 @@ Step-by-step implementation plan (TDD for the pure transition logic):
 
 ## Definition of done
 
-- [ ] `Book` is the discriminated union; `copies: 0` and "owned+wanted" won't type-check
-- [ ] Guards `isOwned`/`isWishlist` narrow correctly; all call sites narrow on `owned`
-- [ ] Variant transitions use `put` (no stale fields); reading history preserved across them
-- [ ] Seed reseeds cleanly (Dexie v3); shelf shows owned status groups + a Wishlist section
-- [ ] Add/edit form creates both owned and wishlist books correctly
-- [ ] Strings via `t()` (en + sk) for any new copy
-- [ ] `npm run check` clean; `npm run build` passes
-- [ ] `AGENTS.md` data-model section updated to match ADR 0008
+- [x] `Book` is the discriminated union; `copies: 0` and "owned+wanted" won't type-check
+- [x] Guards `isOwned`/`isWishlist` narrow correctly; all call sites narrow on `owned`
+- [x] Variant transitions use `put` (no stale fields); reading history preserved across them
+- [x] Seed reseeds cleanly (Dexie v3); shelf shows owned status groups + a Wishlist section
+- [x] Add/edit form creates both owned and wishlist books correctly
+- [x] Strings via `t()` (en + sk) for any new copy
+- [x] `npm run check` clean; `npm run build` passes
+- [x] `AGENTS.md` data-model section updated to match ADR 0008
+
+## Done notes
+
+Implemented per the plan (`docs/superpowers/plans/2026-07-23-ownership-union-refactor.md`)
+and task-2-brief.md, in one atomic commit:
+
+- `types.ts`: `BookCore` + `OwnedBook`/`WishedBook` discriminated union; `isOwned`
+  (`b is OwnedBook`) / `isWishlist` (`!owned && wanted`) guards.
+- `ownership.ts` (new): pure `withCopies`/`acquired`/`withWanted` transitions,
+  TDD'd first — `ownership.test.ts` written and confirmed RED (module missing),
+  then implemented and confirmed GREEN (7/7 tests).
+- `db.ts`: Dexie bumped to v3 (clears + reseeds, no migration); `addBook`/
+  `saveBookEdits` rebuild the right variant from a new `BookInput` shape;
+  `setCopies`/`addCopy`/`setWanted` now `put()` a rebuilt row via `ownership.ts`
+  instead of patching fields onto a possibly-wrong variant; `updateBook` is
+  `Partial<BookCore>` only.
+- `seed.ts`: owned/wished variants via an updated `Seed`/`make` helper; added
+  "The Dispossessed" as a read-elsewhere (`owned:false, wanted:false,
+  status:'completed'`) example.
+- `BookForm.svelte`: Year (core field) always visible; Format/Price (owned-only)
+  hidden under `{#if !isWish}`.
+- `AddBookModal.svelte`, `book/[id]/+page.svelte`, `BookCard.svelte`,
+  `+page.svelte` (shelf), `stats.ts`: all narrowed on `book.owned` /
+  `isWishlist`.
+- i18n: added `detail.wishlist_kicker`, `detail.not_owned_kicker`,
+  `detail.acquire` to en.ts and sk.ts.
+- `npm run check`: 0 errors (22 "captures the initial value" warnings — the
+  17-warning baseline plus 5 new ones from BookForm's additional `initial?.`
+  reads for the owned-only field guards; same pre-existing warning category,
+  not a new class of issue).
+- `npm test`: 7/7 passing. `npm run build`: succeeds (adapter-static wrote the site).
+- Step 17 (interactive browser/IndexedDB smoke) was deferred to human
+  verification — no browser session available in this environment. Code paths
+  for the wishlist panel, "I own this now" acquire flow, copies→0 edit, and
+  new-wishlist-add were read through instead; see the task-2 report for detail.
 
 ## Follow-ups
 
