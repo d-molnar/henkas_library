@@ -87,3 +87,83 @@ describe('deriveSeriesProgress', () => {
 		expect(p.nextToAcquire?.entry.id).toBe('e3');
 	});
 });
+
+import {
+	parseSeriesHint,
+	matchLocalSeries,
+	detectSeriesCandidates,
+	type SeriesCandidate
+} from './series';
+
+describe('parseSeriesHint', () => {
+	it('parses "Name #N"', () => {
+		expect(parseSeriesHint('The Kingkiller Chronicle #1')).toEqual({
+			name: 'The Kingkiller Chronicle',
+			ordinal: 1
+		});
+	});
+	it('parses "Name (N)"', () => {
+		expect(parseSeriesHint('Earthsea (2)')).toEqual({ name: 'Earthsea', ordinal: 2 });
+	});
+	it('parses "Name, Book N" and half ordinals', () => {
+		expect(parseSeriesHint('Broken Earth, Book 2')).toEqual({ name: 'Broken Earth', ordinal: 2 });
+		expect(parseSeriesHint('Kingkiller #2.5')).toEqual({ name: 'Kingkiller', ordinal: 2.5 });
+	});
+	it('returns just the name when there is no number', () => {
+		expect(parseSeriesHint('Standalone Saga')).toEqual({ name: 'Standalone Saga' });
+	});
+});
+
+describe('matchLocalSeries', () => {
+	const series: Series[] = [{ id: 's', name: 'Earthsea', author: 'Ursula K. Le Guin' }];
+	const entries: SeriesEntry[] = [
+		{ id: 'e5', seriesId: 's', ordinal: 5, label: '5', title: 'Tales from Earthsea' }
+	];
+
+	it('matches a book title to a named-missing entry', () => {
+		const m = matchLocalSeries({ title: 'Tales from Earthsea', author: 'Ursula K. Le Guin' }, series, entries);
+		expect(m).toEqual({ kind: 'entry', entry: entries[0] });
+	});
+	it('falls back to author→series when no title matches', () => {
+		const m = matchLocalSeries({ title: 'The Other Wind', author: 'Ursula K. Le Guin' }, series, entries);
+		expect(m).toEqual({ kind: 'series', series: series[0] });
+	});
+	it('returns null when nothing local matches (never fabricates a series)', () => {
+		const m = matchLocalSeries({ title: 'Dune', author: 'Frank Herbert' }, series, entries);
+		expect(m).toBeNull();
+	});
+});
+
+describe('detectSeriesCandidates', () => {
+	const mk = (id: string, title: string, author: string): Book => ({
+		id,
+		title,
+		author,
+		pages: 1,
+		currentPage: 0,
+		entryIds: [],
+		tagIds: [],
+		cover: { from: '#000', to: '#111', ink: '#fff', sub: '#eee' },
+		addedAt: 0,
+		status: 'to-read',
+		owned: true,
+		copies: 1
+	});
+
+	it('groups books sharing a series hint into one candidate', () => {
+		const books = [mk('b1', 'A Wizard of Earthsea', 'UKL'), mk('b2', 'The Tombs of Atuan', 'UKL')];
+		const hints = new Map([
+			['b1', { series: 'Earthsea (1)' }],
+			['b2', { series: 'Earthsea (2)' }]
+		]);
+		const out: SeriesCandidate[] = detectSeriesCandidates(books, hints);
+		expect(out).toHaveLength(1);
+		expect(out[0].name).toBe('Earthsea');
+		expect(out[0].members.map((m) => m.ordinal)).toEqual([1, 2]);
+	});
+
+	it('ignores books with no hint', () => {
+		const books = [mk('b1', 'Dune', 'FH')];
+		expect(detectSeriesCandidates(books, new Map())).toEqual([]);
+	});
+});

@@ -163,3 +163,65 @@ export async function setBookEntries(bookId: string, entryIds: string[]): Promis
 	if (seriesIds.size > 1) throw new Error('setBookEntries: entries span multiple series');
 	await db.books.update(bookId, { entryIds: [...entryIds] });
 }
+
+// ── Detection ─────────────────────────────────────────────────────────
+/** Parse a metadata series string like "Name #1", "Name (1)", "Name, Book 2". */
+export function parseSeriesHint(raw: string): { name: string; ordinal?: number } {
+	const m = raw.match(/^(.*?)[\s,]*(?:#|\(|book\s+|vol\.?\s*|no\.?\s*)\s*(\d+(?:\.\d+)?)\)?\s*$/i);
+	if (m) return { name: m[1].trim(), ordinal: Number(m[2]) };
+	return { name: raw.trim() };
+}
+
+export type LocalMatch =
+	| { kind: 'entry'; entry: SeriesEntry }
+	| { kind: 'series'; series: Series };
+
+/**
+ * Match a book against series that already exist locally — never the network,
+ * never creating a series. title→entry (fills a named-missing slot) wins over
+ * author→series (extend an existing roster).
+ */
+export function matchLocalSeries(
+	book: { title: string; author: string },
+	series: Series[],
+	entries: SeriesEntry[]
+): LocalMatch | null {
+	const title = book.title.trim().toLowerCase();
+	const entry = entries.find((e) => e.title.trim().toLowerCase() === title);
+	if (entry) return { kind: 'entry', entry };
+	const author = book.author.trim().toLowerCase();
+	const s = series.find((x) => x.author.trim().toLowerCase() === author);
+	if (s) return { kind: 'series', series: s };
+	return null;
+}
+
+export interface SeriesCandidate {
+	name: string;
+	author: string;
+	members: { book: Book; ordinal?: number }[];
+	roster: { ordinal: number; title: string }[];
+}
+
+/**
+ * Group candidate books by the series named in their external hints. The roster
+ * is filled separately by fetchSeriesRoster; here it starts empty.
+ */
+export function detectSeriesCandidates(
+	books: Book[],
+	hints: Map<string, { series?: string }>
+): SeriesCandidate[] {
+	const byName = new Map<string, SeriesCandidate>();
+	for (const b of books) {
+		const raw = hints.get(b.id)?.series;
+		if (!raw) continue;
+		const { name, ordinal } = parseSeriesHint(raw);
+		const key = name.toLowerCase();
+		let c = byName.get(key);
+		if (!c) {
+			c = { name, author: b.author, members: [], roster: [] };
+			byName.set(key, c);
+		}
+		c.members.push({ book: b, ordinal });
+	}
+	return [...byName.values()];
+}
