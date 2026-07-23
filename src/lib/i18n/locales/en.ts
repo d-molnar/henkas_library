@@ -96,6 +96,20 @@ export const en = {
 	'progress.cancel': 'Cancel',
 	'progress.save': 'Save progress',
 
+	// tag management
+	'nav.tags': 'Tags',
+	'tags.title': 'Manage tags',
+	'tags.genres': 'Genres',
+	'tags.labels': 'Labels',
+	'tags.empty': 'No tags yet — add some while editing a book.',
+	'tags.empty_section': 'None yet.',
+	'tags.usage': '{count} books',
+	'tags.rename_aria': 'Rename tag',
+	'tags.delete_aria': 'Delete tag',
+	'tags.delete_confirm': 'Delete “{name}”? It will be removed from {count} books.',
+	'tags.merge_into': 'Merge into…',
+	'tags.merge_confirm': 'Merge “{from}” into “{into}”? “{from}” will be deleted and its books re-tagged.',
+
 	// misc
 	'common.unowned': 'Not owned',
 	'common.unowned_price': 'Not owned · €{price} new',

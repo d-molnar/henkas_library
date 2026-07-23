@@ -1,10 +1,10 @@
 ---
 id: 0002
 title: Tag management screen (rename / merge / delete)
-state: todo
+state: done
 module: routes/tags + lib/db
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 ## Goal
@@ -32,9 +32,21 @@ supports it.
 
 ## Definition of done
 
-- [ ] Rename, delete, merge all work and reflect live on the shelf/detail
-- [ ] Strings via `t()` (en + sk)
-- [ ] `npm run check` clean
+- [x] Rename, delete, merge all work and reflect live on the shelf/detail
+- [x] Strings via `t()` (en + sk)
+- [x] `npm run check` clean
+
+## Done notes
+
+- `mergeTags(fromId, intoId)` added to `db.ts` (transaction: swap+dedup tagIds
+  on every affected book, delete source).
+- New `/tags` route: Genres + Labels sections, per-tag inline rename (blur/Enter
+  → `renameTag`), usage count (scans `$books`), delete (confirm → `deleteTag`),
+  and a merge-into `<select>` of same-kind tags (confirm → `mergeTags`).
+- Linked from the top nav and the phone tab bar (`tags` lucide icon).
+- Verified: `npm run check` 0 errors (17 expected form warnings) and
+  `npm run build` clean. Not yet clicked through in a browser (see AGENTS.md
+  verification gap).
 
 ## Follow-ups
 

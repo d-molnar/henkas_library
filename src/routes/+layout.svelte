@@ -9,6 +9,7 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import LibraryBig from 'lucide-svelte/icons/library-big';
 	import Languages from 'lucide-svelte/icons/languages';
+	import TagsIcon from 'lucide-svelte/icons/tags';
 
 	let { children } = $props();
 
@@ -27,6 +28,9 @@
 		<a class="nav-brand" href="/">
 			<BookIcon size={20} strokeWidth={2.4} color="var(--color-accent)" />
 			<span>Henka's Lib</span>
+		</a>
+		<a class="nav-link" href="/tags" aria-current={path === '/tags' ? 'page' : undefined}>
+			<TagsIcon size={16} strokeWidth={2.2} /> {t('nav.tags')}
 		</a>
 		<label class="lang" title={t('app.language')}>
 			<Languages size={16} strokeWidth={2.2} />
@@ -54,6 +58,10 @@
 			<LibraryBig size={20} strokeWidth={2.2} />
 			<span>{t('nav.shelf')}</span>
 		</a>
+		<a href="/tags" aria-current={path === '/tags' ? 'page' : undefined}>
+			<TagsIcon size={20} strokeWidth={2.2} />
+			<span>{t('nav.tags')}</span>
+		</a>
 		<button type="button" onclick={openAdd} class="tab-btn">
 			<Plus size={20} strokeWidth={2.2} />
 			<span>{t('nav.add_short')}</span>
@@ -80,6 +88,11 @@
 		gap: 8px;
 		text-decoration: none;
 		color: inherit;
+	}
+	.nav-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
 	}
 	.tab-btn {
 		background: none;

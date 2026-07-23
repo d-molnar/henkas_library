@@ -91,6 +91,19 @@ export const sk: Partial<Record<MessageKey, string>> = {
 	'progress.cancel': 'Zrušiť',
 	'progress.save': 'Uložiť postup',
 
+	'nav.tags': 'Štítky',
+	'tags.title': 'Správa štítkov',
+	'tags.genres': 'Žánre',
+	'tags.labels': 'Štítky',
+	'tags.empty': 'Zatiaľ žiadne štítky — pridaj ich pri úprave knihy.',
+	'tags.empty_section': 'Zatiaľ žiadne.',
+	'tags.usage': '{count} kníh',
+	'tags.rename_aria': 'Premenovať štítok',
+	'tags.delete_aria': 'Odstrániť štítok',
+	'tags.delete_confirm': 'Odstrániť „{name}”? Bude odobraný z {count} kníh.',
+	'tags.merge_into': 'Zlúčiť do…',
+	'tags.merge_confirm': 'Zlúčiť „{from}” do „{into}”? „{from}” bude odstránený a jeho knihy preznačené.',
+
 	'common.unowned': 'Nevlastním',
 	'common.unowned_price': 'Nevlastním · €{price} nové',
 	'common.unrated': 'bez hodnotenia'
