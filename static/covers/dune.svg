@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+	<defs>
+		<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#402310" />
+			<stop offset="0.55" stop-color="#b2622d" />
+			<stop offset="1" stop-color="#f6a06b" />
+		</linearGradient>
+	</defs>
+	<rect width="400" height="600" fill="url(#sky)" />
+	<circle cx="200" cy="330" r="62" fill="#ffe1d0" opacity="0.92" />
+	<path d="M0 380 C90 340 150 400 400 356 L400 600 L0 600 Z" fill="#8c491a" />
+	<path d="M0 440 C120 400 230 470 400 424 L400 600 L0 600 Z" fill="#643312" />
+	<path d="M0 512 C140 476 250 540 400 500 L400 600 L0 600 Z" fill="#402310" />
+	<g fill="#ffe1d0" opacity="0.5">
+		<circle cx="64" cy="86" r="2" /><circle cx="150" cy="52" r="1.6" />
+		<circle cx="286" cy="98" r="2.2" /><circle cx="342" cy="46" r="1.4" />
+		<circle cx="220" cy="140" r="1.5" /><circle cx="96" cy="170" r="1.7" />
+	</g>
+	<text x="200" y="128" text-anchor="middle" font-family="Georgia, serif" font-size="62"
+		letter-spacing="10" fill="#fff2eb">DUNE</text>
+	<text x="200" y="566" text-anchor="middle" font-family="Georgia, serif" font-size="19"
+		letter-spacing="4" fill="#ffe1d0">FRANK HERBERT</text>
+</svg>

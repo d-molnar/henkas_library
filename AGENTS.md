@@ -46,7 +46,10 @@ src/
     series.ts                 series + seriesEntries stores; deriveSeriesProgress (pure); series/entry/link
                               mutations; detection helpers (parseSeriesHint/matchLocalSeries/detectSeriesCandidates)
     backup.ts                 exportBackup/importBackup (spans books+series+loans)
-    seed.ts                   starter library + seed tags/series/loans
+    seed.ts                   starter library + seed tags/series/loans; six of the seeded
+                              books point at sample cover art in static/covers/*.svg
+                              (original placeholder artwork, not real jackets) so the
+                              image-cover path is visible in dev
     covers.ts                 gradient book-cover palettes (coverFor)
     isbn.ts                   ISBN validate/normalize to ISBN-13
     openlibrary.ts            lookupIsbn / searchBooks (Open Library)

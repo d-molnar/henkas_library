@@ -65,6 +65,26 @@ class HenkaDB extends Dexie {
 				await tx.table('series').clear();
 				await tx.table('loans').clear();
 			});
+		// v5 — sample cover images on some seeded books. Pre-release: no migration,
+		// just clear everything so ensureSeeded() lays the starter library down
+		// again. Clearing *all* tables (not just books/series/loans) matters —
+		// seedTags have fixed ids, so a leftover tags table makes the reseed
+		// bulkAdd fail on a duplicate key and abort the whole transaction.
+		this.version(5)
+			.stores({
+				books: 'id, status, addedAt, finishedAt, isbn',
+				series: 'id',
+				seriesEntries: 'id, seriesId, ordinal',
+				loans: 'id, bookId, returnedAt',
+				tags: 'id, kind'
+			})
+			.upgrade(async (tx) => {
+				await tx.table('books').clear();
+				await tx.table('series').clear();
+				await tx.table('seriesEntries').clear();
+				await tx.table('loans').clear();
+				await tx.table('tags').clear();
+			});
 	}
 }
 
@@ -80,10 +100,12 @@ export async function ensureSeeded(): Promise<void> {
 			const count = await db.books.count();
 			if (count === 0) {
 				await db.transaction('rw', db.books, db.series, db.seriesEntries, db.loans, db.tags, async () => {
-					await db.tags.bulkAdd(seedTags);
+					// put, not add: the seed ids are fixed, so a reseed over a
+					// half-cleared db must overwrite rather than throw.
+					await db.tags.bulkPut(seedTags);
 					await db.books.bulkAdd(seedBooks);
-					await db.series.bulkAdd(seedSeries);
-					await db.seriesEntries.bulkAdd(seedSeriesEntries);
+					await db.series.bulkPut(seedSeries);
+					await db.seriesEntries.bulkPut(seedSeriesEntries);
 					await db.loans.bulkAdd(seedLoans);
 				});
 			}

@@ -76,9 +76,14 @@
 	.badge.wish {
 		color: var(--color-accent-700);
 	}
+	/* Sits on the artwork, so it carries its own scrim — an image cover may have
+	   anything (often the author's name) under it. */
 	.progress-strip {
 		position: absolute;
-		inset: auto 8px 8px;
+		inset: auto 6px 6px;
+		padding: 4px 6px;
+		border-radius: 999px;
+		background: color-mix(in srgb, #201e1d 55%, transparent);
 	}
 	/* Two fixed lines: a long title is clamped (full text in the tooltip) so it
 	   can never push the card's meta row out of line with its neighbours'. */

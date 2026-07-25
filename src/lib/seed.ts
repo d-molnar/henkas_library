@@ -90,6 +90,7 @@ const raw: Seed[] = [
 	// ── Reading now ──
 	{
 		title: 'The Buried Giant',
+		coverImage: '/covers/the-buried-giant.svg',
 		author: 'Kazuo Ishiguro',
 		status: 'reading',
 		pages: 310,
@@ -108,6 +109,7 @@ const raw: Seed[] = [
 	},
 	{
 		title: 'Braiding Sweetgrass',
+		coverImage: '/covers/braiding-sweetgrass.svg',
 		author: 'Robin Wall Kimmerer',
 		status: 'reading',
 		pages: 390,
@@ -120,6 +122,7 @@ const raw: Seed[] = [
 	},
 	{
 		title: 'Piranesi',
+		coverImage: '/covers/piranesi.svg',
 		author: 'Susanna Clarke',
 		status: 'reading',
 		pages: 245,
@@ -209,6 +212,7 @@ const raw: Seed[] = [
 	// ── On loan (owned, currently lent) ──
 	{
 		title: 'Project Hail Mary',
+		coverImage: '/covers/project-hail-mary.svg',
 		author: 'Andy Weir',
 		status: 'to-read',
 		pages: 476,
@@ -240,14 +244,14 @@ const raw: Seed[] = [
 	{ title: 'The Broken Earth Trilogy', author: 'N. K. Jemisin', status: 'reading', pages: 1400, currentPage: 900, genres: ['Sci-fi'], format: 'Omnibus', entryIds: ['e-be-1', 'e-be-2', 'e-be-3'], pricePaid: 30, estValue: 33, startedAt: d(2026, 7, 10) },
 
 	// ── More completed across 2026 (drive the stats chart) ──
-	{ title: 'Dune', author: 'Frank Herbert', status: 'completed', pages: 688, currentPage: 688, rating: 5, genres: ['Sci-fi'], finishedAt: d(2026, 1, 30), pricePaid: 10 },
+	{ title: 'Dune', author: 'Frank Herbert', coverImage: '/covers/dune.svg', status: 'completed', pages: 688, currentPage: 688, rating: 5, genres: ['Sci-fi'], finishedAt: d(2026, 1, 30), pricePaid: 10 },
 	{ title: 'Klara and the Sun', author: 'Kazuo Ishiguro', status: 'completed', pages: 303, currentPage: 303, rating: 4, genres: ['Sci-fi'], finishedAt: d(2026, 2, 12), pricePaid: 16 },
 	{ title: 'The Song of Achilles', author: 'Madeline Miller', status: 'completed', pages: 352, currentPage: 352, rating: 5, genres: ['Fantasy'], finishedAt: d(2026, 3, 5), pricePaid: 13 },
 	{ title: 'A Short History of Nearly Everything', author: 'Bill Bryson', status: 'completed', pages: 544, currentPage: 544, rating: 4, genres: ['History'], finishedAt: d(2026, 3, 28), pricePaid: 12 },
 	{ title: 'The Left Hand of Darkness', author: 'Ursula K. Le Guin', status: 'completed', pages: 304, currentPage: 304, rating: 5, genres: ['Sci-fi'], finishedAt: d(2026, 4, 18), pricePaid: 10 },
 	{ title: 'Wolf Hall', author: 'Hilary Mantel', status: 'completed', pages: 604, currentPage: 604, rating: 4, genres: ['History'], finishedAt: d(2026, 5, 6), pricePaid: 14 },
 	{ title: 'Bring Up the Bodies', author: 'Hilary Mantel', status: 'completed', pages: 432, currentPage: 432, rating: 5, genres: ['History'], finishedAt: d(2026, 5, 20), pricePaid: 14 },
-	{ title: 'The Hobbit', author: 'J. R. R. Tolkien', status: 'completed', pages: 310, currentPage: 310, rating: 5, genres: ['Fantasy'], finishedAt: d(2026, 5, 29), pricePaid: 8 },
+	{ title: 'The Hobbit', author: 'J. R. R. Tolkien', coverImage: '/covers/the-hobbit.svg', status: 'completed', pages: 310, currentPage: 310, rating: 5, genres: ['Fantasy'], finishedAt: d(2026, 5, 29), pricePaid: 8 },
 	{ title: 'Educated', author: 'Tara Westover', status: 'completed', pages: 334, currentPage: 334, rating: 4, genres: ['History'], finishedAt: d(2026, 6, 15), pricePaid: 13 },
 	{ title: 'The Underground Railroad', author: 'Colson Whitehead', status: 'completed', pages: 320, currentPage: 320, rating: 4, genres: ['History'], finishedAt: d(2026, 6, 27), pricePaid: 12 },
 	{ title: 'Recursion', author: 'Blake Crouch', status: 'completed', pages: 336, currentPage: 336, rating: 4, genres: ['Sci-fi'], finishedAt: d(2026, 7, 8), pricePaid: 11 }
