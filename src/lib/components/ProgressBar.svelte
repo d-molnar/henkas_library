@@ -3,14 +3,30 @@
 		value,
 		max = 100,
 		height = 5,
-		knob = false
-	}: { value: number; max?: number; height?: number; knob?: boolean } = $props();
+		knob = false,
+		color,
+		label
+	}: {
+		value: number;
+		max?: number;
+		height?: number;
+		knob?: boolean;
+		/** Override the fill colour (defaults to the accent from app.css). */
+		color?: string;
+		label?: string;
+	} = $props();
 
 	const pct = $derived(max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0);
 </script>
 
-<div class="progress" style:height="{height}px" role="progressbar" aria-valuenow={Math.round(pct)}>
-	<span style:width="{pct}%"></span>
+<div
+	class="progress"
+	style:height="{height}px"
+	role="progressbar"
+	aria-valuenow={Math.round(pct)}
+	aria-label={label}
+>
+	<span style:width="{pct}%" style:background={color}></span>
 	{#if knob}
 		<i class="knob" style:left="{pct}%"></i>
 	{/if}

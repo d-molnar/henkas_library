@@ -56,12 +56,14 @@ src/
       index.svelte.ts         reactive t(), setLocale, LOCALES, formatDate
       locales/en.ts           source of truth for MessageKey (every key lives here)
       locales/sk.ts           Slovak (Partial; missing keys fall back to en)
-    components/               BookCover, BookCard, ProgressBar, StarRating, Modal,
+    components/               BookCover, BookCard, SeriesCard, ProgressBar, StarRating, Modal,
                               TagPicker, BookForm, AddBookModal, UpdateProgressModal, ModalHost
   routes/
     +layout.svelte            shell: nav, language switcher, modal host, phone tab bar
     +page.svelte              shelf (screen 1a)
     book/[id]/+page.svelte    book detail + inline edit (screen 1b)
+    series/+page.svelte       series cards / collection progress (screen 1d)
+    tags/+page.svelte         tag management (rename / merge / delete)
 ```
 
 ## Data model (important — see ADRs 0004–0006, 0008, 0009)

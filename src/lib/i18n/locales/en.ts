@@ -113,6 +113,23 @@ export const en = {
 	'tags.merge_into': 'Merge into…',
 	'tags.merge_confirm': 'Merge “{from}” into “{into}”? “{from}” will be deleted and its books re-tagged.',
 
+	// series
+	'nav.series': 'Series',
+	'series.title': 'Series',
+	'series.count': '{count} series',
+	'series.empty': 'No series yet — group books into a series while editing them.',
+	'series.counts': 'own {owned} of {available} · read {read}',
+	'series.next': 'Next: {title}',
+	'series.missing': '{count} missing',
+	'series.complete': 'Complete',
+	'series.volumes': 'Volumes',
+	'series.hide_volumes': 'Hide volumes',
+	'series.vol_owned': 'Owned',
+	'series.vol_wanted': 'Wishlist',
+	'series.vol_missing': 'Missing',
+	'series.vol_read': 'Read',
+	'series.progress_aria': 'Volumes owned',
+
 	// misc
 	'common.unowned': 'Not owned',
 	'common.unowned_price': 'Not owned · €{price} new',

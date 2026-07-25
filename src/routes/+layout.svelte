@@ -10,6 +10,7 @@
 	import LibraryBig from 'lucide-svelte/icons/library-big';
 	import Languages from 'lucide-svelte/icons/languages';
 	import TagsIcon from 'lucide-svelte/icons/tags';
+	import Layers from 'lucide-svelte/icons/layers';
 
 	let { children } = $props();
 
@@ -28,6 +29,9 @@
 		<a class="nav-brand" href="/">
 			<BookIcon size={20} strokeWidth={2.4} color="var(--color-accent)" />
 			<span>Henka's Lib</span>
+		</a>
+		<a class="nav-link" href="/series" aria-current={path === '/series' ? 'page' : undefined}>
+			<Layers size={16} strokeWidth={2.2} /> {t('nav.series')}
 		</a>
 		<a class="nav-link" href="/tags" aria-current={path === '/tags' ? 'page' : undefined}>
 			<TagsIcon size={16} strokeWidth={2.2} /> {t('nav.tags')}
@@ -57,6 +61,10 @@
 		<a href="/" aria-current={path === '/' ? 'page' : undefined}>
 			<LibraryBig size={20} strokeWidth={2.2} />
 			<span>{t('nav.shelf')}</span>
+		</a>
+		<a href="/series" aria-current={path === '/series' ? 'page' : undefined}>
+			<Layers size={20} strokeWidth={2.2} />
+			<span>{t('nav.series')}</span>
 		</a>
 		<a href="/tags" aria-current={path === '/tags' ? 'page' : undefined}>
 			<TagsIcon size={20} strokeWidth={2.2} />

@@ -107,6 +107,22 @@ export const sk: Partial<Record<MessageKey, string>> = {
 	'tags.merge_into': 'Zlúčiť do…',
 	'tags.merge_confirm': 'Zlúčiť „{from}” do „{into}”? „{from}” bude odstránený a jeho knihy preznačené.',
 
+	'nav.series': 'Série',
+	'series.title': 'Série',
+	'series.count': 'sérií: {count}',
+	'series.empty': 'Zatiaľ žiadne série — knihy zoskupíš do série pri ich úprave.',
+	'series.counts': 'vlastníš {owned} z {available} · prečítané {read}',
+	'series.next': 'Ďalej: {title}',
+	'series.missing': 'chýba {count}',
+	'series.complete': 'Kompletné',
+	'series.volumes': 'Zväzky',
+	'series.hide_volumes': 'Skryť zväzky',
+	'series.vol_owned': 'Vlastním',
+	'series.vol_wanted': 'Zoznam želaní',
+	'series.vol_missing': 'Chýba',
+	'series.vol_read': 'Prečítané',
+	'series.progress_aria': 'Vlastnené zväzky',
+
 	'common.unowned': 'Nevlastním',
 	'common.unowned_price': 'Nevlastním · €{price} nové',
 	'common.unrated': 'bez hodnotenia'
