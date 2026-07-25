@@ -4,8 +4,6 @@
 	import { t } from '$lib/i18n/index.svelte';
 	import Modal from './Modal.svelte';
 	import ProgressBar from './ProgressBar.svelte';
-	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import Check from 'lucide-svelte/icons/check';
 	import X from 'lucide-svelte/icons/x';
 
@@ -29,8 +27,8 @@
 	const pct = $derived(total > 0 ? Math.round((page / total) * 100) : 0);
 	const left = $derived(Math.max(0, total - page));
 
-	/** Three step sizes per side: one page, ten, fifty. */
-	const STEPS = [1, 10, 50] as const;
+	/** Two step sizes per side; anything bigger is a drag on the bar below. */
+	const STEPS = [1, 10] as const;
 
 	function clamp(n: number) {
 		page = Math.max(0, Math.min(n, total));
@@ -67,49 +65,39 @@
 		</div>
 
 		<div class="stepper">
-			{#each [...STEPS].reverse() as n, i (n)}
+			{#each [...STEPS].reverse() as n (n)}
 				<button
 					class="step"
+					class:one={n === 1}
 					aria-label={t('progress.back_n', { n })}
 					onclick={() => step(-n)}
 				>
-					<span class="chevrons">
-						{#each { length: STEPS.length - i } as _, c (c)}
-							<ChevronLeft size={16} strokeWidth={2.6} />
-						{/each}
-					</span>
-					<span class="delta">−{n}</span>
+					{n === 1 ? '−' : `−${n}`}
 				</button>
 			{/each}
 
-			<div class="num">
-				<input
-					class="input"
-					type="number"
-					inputmode="numeric"
-					min="0"
-					max={total}
-					bind:value={page}
-					oninput={() => clamp(page)}
-				/>
-				<div class="of">{t('progress.of_pages', { total })}</div>
-			</div>
+			<input
+				class="input num"
+				type="number"
+				inputmode="numeric"
+				min="0"
+				max={total}
+				bind:value={page}
+				oninput={() => clamp(page)}
+			/>
 
-			{#each STEPS as n, i (n)}
+			{#each STEPS as n (n)}
 				<button
 					class="step"
+					class:one={n === 1}
 					aria-label={t('progress.fwd_n', { n })}
 					onclick={() => step(n)}
 				>
-					<span class="chevrons">
-						{#each { length: i + 1 } as _, c (c)}
-							<ChevronRight size={16} strokeWidth={2.6} />
-						{/each}
-					</span>
-					<span class="delta">+{n}</span>
+					{n === 1 ? '+' : `+${n}`}
 				</button>
 			{/each}
 		</div>
+		<div class="of">{t('progress.of_pages', { total })}</div>
 
 		<ProgressBar
 			value={page}
@@ -160,75 +148,77 @@
 		width: 30px;
 		height: 30px;
 	}
+	/* One control, not seven: the steps and the page field share a single
+	   rounded outline, divided by hairlines. */
 	.stepper {
 		display: flex;
-		align-items: flex-start;
-		gap: 2px;
-		justify-content: center;
-		padding: 6px 0;
+		align-items: stretch;
+		border: 1px solid var(--color-divider);
+		border-radius: var(--radius-md);
+		background: var(--color-surface);
+		overflow: hidden;
 	}
 	.step {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 2px;
+		flex: 1 1 0;
+		min-width: 0;
 		padding: 0;
 		border: 0;
+		border-right: 1px solid var(--color-divider);
 		background: none;
 		color: inherit;
-		font: inherit;
-		cursor: pointer;
-		border-radius: var(--radius-sm);
-		/* the arrows sit on the number's line; the delta label hangs below */
-		padding-top: 14px;
-	}
-	.step:hover .chevrons {
-		color: var(--color-accent);
-	}
-	.step:active .chevrons {
-		transform: scale(0.92);
-	}
-	.chevrons {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 34px;
-		height: 34px;
-		opacity: 0.85;
-		transition: color 0.12s ease;
-	}
-	/* overlap the glyphs so «« reads as one control, not two arrows */
-	.chevrons > :global(svg:not(:last-child)) {
-		margin-right: -7px;
-	}
-	.delta {
-		font-size: 10px;
+		font-family: var(--font-heading);
+		font-size: 15px;
+		line-height: 1;
 		font-variant-numeric: tabular-nums;
-		opacity: 0.45;
+		cursor: pointer;
+		transition: background 0.12s ease;
 	}
+	/* the bare +/− carries the same ink as "+10" at this size */
+	.step.one {
+		font-size: 24px;
+	}
+	.step:last-child {
+		border-right: 0;
+	}
+	.step:hover {
+		background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+	}
+	.step:active {
+		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+	}
+	/* Same flex basis as a step, 1.5× the share — the field reads as the centre
+	   of the group at any dialog width without starving the tap targets. */
 	.num {
-		text-align: center;
-		margin: 0 6px;
-	}
-	.num .input {
-		width: 96px;
+		flex: 1.5 1 0;
+		width: auto;
+		min-width: 0;
+		min-height: 56px;
 		text-align: center;
 		font-family: var(--font-heading);
-		font-size: 30px;
-		min-height: 56px;
-		/* no spinners: the arrow steps are the affordance here */
+		font-size: 24px;
+		/* the field is a segment of the group — no outline of its own */
+		border: 0;
+		border-right: 1px solid var(--color-divider);
+		border-radius: 0;
+		background: none;
+		/* no spinners: the steps are the affordance here */
 		appearance: textfield;
 		-moz-appearance: textfield;
 	}
-	.num .input::-webkit-outer-spin-button,
-	.num .input::-webkit-inner-spin-button {
+	.num::-webkit-outer-spin-button,
+	.num::-webkit-inner-spin-button {
 		appearance: none;
 		margin: 0;
 	}
-	.num .of {
+	.num:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: -2px;
+	}
+	.of {
+		text-align: center;
 		font-size: 11px;
 		opacity: 0.5;
-		margin-top: 2px;
+		margin-top: -6px;
 	}
 	.pctline {
 		display: flex;

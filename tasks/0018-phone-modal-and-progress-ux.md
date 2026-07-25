@@ -36,9 +36,12 @@ with your thumb.
     re-runs, tears down (popping history) and re-pushes — each back press then
     unwound several entries and left the app. `onMount` doesn't track.
 - **Progress stepper reshaped** (screen 1h): the number input lost its spinner
-  arrows; three chevron steps per side (`‹` 1, `‹‹` 10, `‹‹‹` 50) flank it with
-  a small grey `−50 −10 −1 / +1 +10 +50` label under each. The old +10/+25/+50
-  tag row is gone (redundant).
+  arrows, and the steps became one segmented control — a single rounded outline
+  around `−10 − [ page ] + +10`, divided by hairlines, buttons of equal width
+  (~52×56 on a phone) and the field 1.5× a button's share. The bare ± sits at
+  24px against the 15px `±10` so the labels carry equal ink. Only two step
+  sizes: bigger jumps are a drag on the bar. The old +10/+25/+50 tag row is
+  gone (redundant).
 - **Progress bar is a slider** in that modal: `ProgressBar` takes an optional
   `onseek` and becomes `role="slider"` — tap or drag anywhere on the bar
   (hit area padded to ~34px), arrow keys / Shift+arrows / Home / End on desktop.
