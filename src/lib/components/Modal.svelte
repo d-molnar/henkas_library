@@ -1,5 +1,7 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/state';
 
 	let {
 		onclose,
@@ -10,6 +12,35 @@
 	function onkeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') onclose();
 	}
+
+	// Back button closes the modal: opening pushes a shallow history entry (same
+	// URL, marker in page.state) and popping it — via the browser/Android back
+	// button — closes. Forward re-pushes the entry but does not reopen; a dialog
+	// isn't a place, so re-entering it by accident would be worse than the
+	// dangling entry.
+	const token = crypto.randomUUID();
+	let pushed = $state(false);
+	// Set the moment history drops our entry, so teardown knows the entry is
+	// already gone. Reading page.state in the teardown itself is too late —
+	// SvelteKit updates it after the pop, and we'd pop a second entry.
+	let popped = false;
+	// onMount, not $effect: pushState touches page state, and an effect that both
+	// reads and writes it re-runs, tearing down and re-pushing on every change.
+	onMount(() => {
+		pushState('', { modal: token });
+		pushed = true;
+		return () => {
+			// Closed from the UI while our entry is still current — drop it, so the
+			// next back press leaves the page instead of doing nothing.
+			if (!popped) history.back();
+		};
+	});
+	$effect(() => {
+		if (pushed && page.state.modal !== token) {
+			popped = true;
+			onclose();
+		}
+	});
 
 	let dialogEl: HTMLDivElement | undefined = $state();
 	$effect(() => {
