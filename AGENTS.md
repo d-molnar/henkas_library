@@ -36,14 +36,15 @@ initial value" warnings in forms are expected (one-time seeds).
 src/
   app.css                     Organic design system (tokens + component classes) + app helpers
   lib/
-    types.ts                  BookCore, OwnedBook, WishedBook, Book (union), Tag, Series, Loan,
+    types.ts                  BookCore, OwnedBook, WishedBook, Book (union), Tag, Series, SeriesEntry, Loan,
                               Status; isOwned/isWishlist guards
     ownership.ts              pure ownership transitions (withCopies/acquired/withWanted), unit-tested
     db.ts                     shared infra ONLY: HenkaDB Dexie schema/instance, ensureSeeded, live() store helper
     books.ts                  books store + bookById + BookInput + all books-table mutations (add/edit, reading, ownership)
     lending.ts                loans/activeLoans stores + lendBook/returnLoan (lending → books; never the reverse)
     tags.ts                   tags store + ensureTag/renameTag/deleteTag/mergeTags
-    series.ts                 series store
+    series.ts                 series + seriesEntries stores; deriveSeriesProgress (pure); series/entry/link
+                              mutations; detection helpers (parseSeriesHint/matchLocalSeries/detectSeriesCandidates)
     backup.ts                 exportBackup/importBackup (spans books+series+loans)
     seed.ts                   starter library + seed tags/series/loans
     covers.ts                 gradient book-cover palettes (coverFor)
@@ -63,7 +64,7 @@ src/
     book/[id]/+page.svelte    book detail + inline edit (screen 1b)
 ```
 
-## Data model (important — see ADRs 0004–0006, 0008)
+## Data model (important — see ADRs 0004–0006, 0008, 0009)
 
 - **Identity is a UUID** (`Book.id`). ISBN is an optional, normalized (ISBN-13),
   indexed *attribute* used for lookup/dedup — never identity.
@@ -89,6 +90,15 @@ src/
   Books reference **`tagIds`**. Genres are simply tags with `kind: 'genre'`.
   Rename a tag in one place (`renameTag`) and every book follows. This is what
   makes tags rename-safe and i18n-ready.
+- **Series volumes are entities** (`seriesEntries` table; ADR 0009): a
+  `SeriesEntry { id, seriesId, ordinal, label, title }` is an edition-agnostic
+  volume that exists whether or not it's owned (so a *named-missing* volume is just
+  an entry with no book). Books link many-to-many via **`entryIds`** — omnibus =
+  one book → many entries; editions = many books → one entry; standalone = `[]`.
+  `Series` has no `totalVolumes`; "available" is derived as the entry count.
+  `series.ts` owns `deriveSeriesProgress` (per-volume slots, ownership union +
+  orthogonal read flag), the entry/link mutations, and the detection helpers;
+  `books.ts` never imports `series.ts`.
 
 ## Conventions
 

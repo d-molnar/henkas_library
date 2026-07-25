@@ -25,8 +25,7 @@ export interface BookCore {
 	isbn?: string;
 	year?: number;
 	publisher?: string;
-	seriesId?: string;
-	seriesIndex?: number;
+	entryIds: string[]; // series volumes this book provides: [] standalone, [x] single, [x,y,z] omnibus
 	tagIds: string[];
 	notes?: string;
 	cover: Cover;
@@ -63,7 +62,16 @@ export interface Series {
 	id: string;
 	name: string;
 	author: string;
-	totalVolumes: number;
+	// "currently available" volume count is derived as the number of SeriesEntry rows
+}
+
+/** A canonical volume in a series — edition-agnostic, exists whether or not owned. */
+export interface SeriesEntry {
+	id: string;
+	seriesId: string;
+	ordinal: number; // sortable position: 0 (prequel), 1, 2, 3, 3.5 (novella)
+	label: string; // display token: "1", "2.5", "Book 0"
+	title: string; // canonical title — known even when unowned
 }
 
 export interface Loan {

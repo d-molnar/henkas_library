@@ -1,13 +1,33 @@
-import type { Book, BookCore, Loan, Series, Status, Tag } from './types';
+import type { Book, BookCore, Loan, Series, SeriesEntry, Status, Tag } from './types';
 import { coverFor } from './covers';
 
 /** 2026 timestamps helper */
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day).getTime();
 
 export const seedSeries: Series[] = [
-	{ id: 'kingkiller', name: 'The Kingkiller Chronicle', author: 'Patrick Rothfuss', totalVolumes: 3 },
-	{ id: 'earthsea', name: 'Earthsea Cycle', author: 'Ursula K. Le Guin', totalVolumes: 6 },
-	{ id: 'broken-earth', name: 'The Broken Earth', author: 'N. K. Jemisin', totalVolumes: 3 }
+	{ id: 'kingkiller', name: 'The Kingkiller Chronicle', author: 'Patrick Rothfuss' },
+	{ id: 'earthsea', name: 'Earthsea Cycle', author: 'Ursula K. Le Guin' },
+	{ id: 'broken-earth', name: 'The Broken Earth', author: 'N. K. Jemisin' }
+];
+
+// Canonical volumes. Some have no owned book (named-missing); one Kingkiller entry is
+// a novella (ordinal 2.5); Broken Earth is provided by a single omnibus book.
+export const seedSeriesEntries: SeriesEntry[] = [
+	// Kingkiller — demonstrates a novella (half ordinal)
+	{ id: 'e-kk-1', seriesId: 'kingkiller', ordinal: 1, label: '1', title: 'The Name of the Wind' },
+	{ id: 'e-kk-2', seriesId: 'kingkiller', ordinal: 2, label: '2', title: "The Wise Man's Fear" },
+	{ id: 'e-kk-25', seriesId: 'kingkiller', ordinal: 2.5, label: '2.5', title: 'The Slow Regard of Silent Things' },
+	// Earthsea — demonstrates named-missing (e-es-5) and read-elsewhere (e-es-6)
+	{ id: 'e-es-1', seriesId: 'earthsea', ordinal: 1, label: '1', title: 'A Wizard of Earthsea' },
+	{ id: 'e-es-2', seriesId: 'earthsea', ordinal: 2, label: '2', title: 'The Tombs of Atuan' },
+	{ id: 'e-es-3', seriesId: 'earthsea', ordinal: 3, label: '3', title: 'The Farthest Shore' },
+	{ id: 'e-es-4', seriesId: 'earthsea', ordinal: 4, label: '4', title: 'Tehanu' },
+	{ id: 'e-es-5', seriesId: 'earthsea', ordinal: 5, label: '5', title: 'Tales from Earthsea' },
+	{ id: 'e-es-6', seriesId: 'earthsea', ordinal: 6, label: '6', title: 'The Other Wind' },
+	// Broken Earth — provided by one omnibus book
+	{ id: 'e-be-1', seriesId: 'broken-earth', ordinal: 1, label: '1', title: 'The Fifth Season' },
+	{ id: 'e-be-2', seriesId: 'broken-earth', ordinal: 2, label: '2', title: 'The Obelisk Gate' },
+	{ id: 'e-be-3', seriesId: 'broken-earth', ordinal: 3, label: '3', title: 'The Stone Sky' }
 ];
 
 // Tags are entities with stable ids. Genres are tags with kind 'genre'.
@@ -44,8 +64,7 @@ type Seed = {
 	year?: number;
 	publisher?: string;
 	isbn?: string;
-	seriesId?: string;
-	seriesIndex?: number;
+	entryIds?: string[];
 	startedAt?: number;
 	finishedAt?: number;
 	addedAt?: number;
@@ -59,6 +78,7 @@ const make = ({ genres, labels, copies = 1, wanted, format, pricePaid, estValue,
 		currentPage: s.currentPage ?? 0,
 		cover: coverFor(s.title),
 		addedAt: s.addedAt ?? d(2026, 1, 1),
+		entryIds: s.entryIds ?? [],
 		tagIds: [...resolve(genres), ...resolve(labels)]
 	};
 	return copies >= 1
@@ -124,8 +144,7 @@ const raw: Seed[] = [
 		publisher: 'DAW Books',
 		genres: ['Fantasy'],
 		isbn: '9780756404079',
-		seriesId: 'kingkiller',
-		seriesIndex: 1,
+		entryIds: ['e-kk-1'],
 		pricePaid: 12
 	},
 	{
@@ -138,8 +157,7 @@ const raw: Seed[] = [
 		year: 2011,
 		publisher: 'DAW Books',
 		genres: ['Fantasy'],
-		seriesId: 'kingkiller',
-		seriesIndex: 2,
+		entryIds: ['e-kk-2'],
 		finishedAt: d(2026, 3, 20),
 		pricePaid: 13
 	},
@@ -151,8 +169,7 @@ const raw: Seed[] = [
 		year: 2014,
 		publisher: 'DAW Books',
 		genres: ['Fantasy'],
-		seriesId: 'kingkiller',
-		seriesIndex: 3
+		entryIds: ['e-kk-25']
 	},
 	{
 		title: 'Entangled Life',
@@ -213,14 +230,14 @@ const raw: Seed[] = [
 	},
 
 	// ── Earthsea ──
-	{ title: 'A Wizard of Earthsea', author: 'Ursula K. Le Guin', status: 'completed', pages: 183, currentPage: 183, rating: 5, genres: ['Fantasy'], seriesId: 'earthsea', seriesIndex: 1, finishedAt: d(2026, 1, 14), pricePaid: 9 },
-	{ title: 'The Tombs of Atuan', author: 'Ursula K. Le Guin', status: 'completed', pages: 180, currentPage: 180, rating: 4, genres: ['Fantasy'], seriesId: 'earthsea', seriesIndex: 2, finishedAt: d(2026, 2, 2), pricePaid: 9 },
-	{ title: 'The Farthest Shore', author: 'Ursula K. Le Guin', status: 'completed', pages: 197, currentPage: 197, rating: 4, genres: ['Fantasy'], seriesId: 'earthsea', seriesIndex: 3, finishedAt: d(2026, 2, 21), pricePaid: 9 },
-	{ title: 'Tehanu', author: 'Ursula K. Le Guin', status: 'to-read', pages: 226, genres: ['Fantasy'], seriesId: 'earthsea', seriesIndex: 4, pricePaid: 9 },
+	{ title: 'A Wizard of Earthsea', author: 'Ursula K. Le Guin', status: 'completed', pages: 183, currentPage: 183, rating: 5, genres: ['Fantasy'], entryIds: ['e-es-1'], finishedAt: d(2026, 1, 14), pricePaid: 9 },
+	{ title: 'The Tombs of Atuan', author: 'Ursula K. Le Guin', status: 'completed', pages: 180, currentPage: 180, rating: 4, genres: ['Fantasy'], entryIds: ['e-es-2'], finishedAt: d(2026, 2, 2), pricePaid: 9 },
+	{ title: 'The Farthest Shore', author: 'Ursula K. Le Guin', status: 'completed', pages: 197, currentPage: 197, rating: 4, genres: ['Fantasy'], entryIds: ['e-es-3'], finishedAt: d(2026, 2, 21), pricePaid: 9 },
+	{ title: 'Tehanu', author: 'Ursula K. Le Guin', status: 'to-read', pages: 226, genres: ['Fantasy'], entryIds: ['e-es-4'], pricePaid: 9 },
+	{ title: 'The Other Wind', author: 'Ursula K. Le Guin', status: 'completed', pages: 246, currentPage: 246, rating: 4, copies: 0, wanted: false, genres: ['Fantasy'], entryIds: ['e-es-6'], finishedAt: d(2026, 5, 12) },
 
 	// ── Broken Earth ──
-	{ title: 'The Fifth Season', author: 'N. K. Jemisin', status: 'completed', pages: 468, currentPage: 468, rating: 5, genres: ['Sci-fi'], seriesId: 'broken-earth', seriesIndex: 1, finishedAt: d(2026, 4, 10), pricePaid: 11 },
-	{ title: 'The Obelisk Gate', author: 'N. K. Jemisin', status: 'reading', pages: 448, currentPage: 130, genres: ['Sci-fi'], seriesId: 'broken-earth', seriesIndex: 2, startedAt: d(2026, 7, 10), pricePaid: 11 },
+	{ title: 'The Broken Earth Trilogy', author: 'N. K. Jemisin', status: 'reading', pages: 1400, currentPage: 900, genres: ['Sci-fi'], format: 'Omnibus', entryIds: ['e-be-1', 'e-be-2', 'e-be-3'], pricePaid: 30, estValue: 33, startedAt: d(2026, 7, 10) },
 
 	// ── More completed across 2026 (drive the stats chart) ──
 	{ title: 'Dune', author: 'Frank Herbert', status: 'completed', pages: 688, currentPage: 688, rating: 5, genres: ['Sci-fi'], finishedAt: d(2026, 1, 30), pricePaid: 10 },

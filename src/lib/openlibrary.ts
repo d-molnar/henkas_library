@@ -10,6 +10,7 @@ export interface LookupResult {
 	isbn?: string;
 	genre?: string;
 	coverImage?: string;
+	series?: string; // raw Open Library series string, e.g. "Earthsea #1" (often absent)
 }
 
 const yearFrom = (s?: string): number | undefined => {
@@ -39,7 +40,8 @@ export async function lookupIsbn(rawIsbn: string, signal?: AbortSignal): Promise
 		publisher: (rec.publishers ?? []).map((p: { name: string }) => p.name)[0],
 		isbn: norm,
 		genre: (rec.subjects ?? []).map((s: { name: string }) => s.name)[0],
-		coverImage: rec.cover?.medium ?? `https://covers.openlibrary.org/b/isbn/${norm}-M.jpg`
+		coverImage: rec.cover?.medium ?? `https://covers.openlibrary.org/b/isbn/${norm}-M.jpg`,
+		series: Array.isArray(rec.series) ? rec.series[0]?.name ?? rec.series[0] : rec.series
 	};
 }
 
@@ -74,4 +76,45 @@ export async function searchBooks(query: string, signal?: AbortSignal): Promise<
 					: undefined
 		} satisfies SearchHit;
 	});
+}
+
+export interface RosterVolume {
+	ordinal: number;
+	title: string;
+}
+
+// Local copy of the hint pattern (kept here to avoid a series.ts → openlibrary.ts import).
+function ordinalFromSeries(raw: string): number | undefined {
+	const m = raw.match(/(?:#|\(|book\s+|vol\.?\s*|no\.?\s*)\s*(\d+(?:\.\d+)?)/i);
+	return m ? Number(m[1]) : undefined;
+}
+
+/** Pure: turn an Open Library search response into a sorted, deduped roster. */
+export function parseRosterResponse(json: unknown): RosterVolume[] {
+	const docs = (json as { docs?: unknown[] })?.docs;
+	if (!Array.isArray(docs)) return [];
+	const byOrdinal = new Map<number, RosterVolume>();
+	for (const d of docs) {
+		const doc = d as { title?: string; series?: unknown };
+		const seriesStr = Array.isArray(doc.series) ? String(doc.series[0]) : undefined;
+		const ordinal = seriesStr ? ordinalFromSeries(seriesStr) : undefined;
+		if (ordinal == null || !doc.title) continue;
+		if (!byOrdinal.has(ordinal)) byOrdinal.set(ordinal, { ordinal, title: doc.title });
+	}
+	return [...byOrdinal.values()].sort((a, b) => a.ordinal - b.ordinal);
+}
+
+/**
+ * Best-effort: fetch the volumes of a series by name. Open Library's series data is
+ * sparse and inconsistent, so callers must let the user fix/fill the result by hand.
+ */
+export async function fetchSeriesRoster(name: string, signal?: AbortSignal): Promise<RosterVolume[]> {
+	const q = name.trim();
+	if (!q) return [];
+	const url =
+		`https://openlibrary.org/search.json?q=${encodeURIComponent(`series:"${q}"`)}` +
+		`&fields=title,series&limit=40`;
+	const res = await fetch(url, { signal });
+	if (!res.ok) return [];
+	return parseRosterResponse(await res.json());
 }

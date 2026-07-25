@@ -28,8 +28,7 @@ export interface BookInput {
 	estValue?: number;
 	tagIds?: string[];
 	coverImage?: string;
-	seriesId?: string;
-	seriesIndex?: number;
+	entryIds?: string[];
 	rating?: number;
 	notes?: string;
 }
@@ -47,8 +46,7 @@ function coreFromInput(input: BookInput, base: Pick<BookCore, 'id' | 'cover' | '
 		isbn: normalizeIsbn(input.isbn) ?? undefined,
 		year: input.year,
 		publisher: input.publisher,
-		seriesId: input.seriesId,
-		seriesIndex: input.seriesIndex,
+		entryIds: input.entryIds ?? [],
 		rating: input.rating,
 		notes: input.notes
 	};

@@ -3,13 +3,13 @@ import type { Book, OwnedBook, WishedBook } from './types';
 import { withCopies, acquired, withWanted, wantedAfterEdit } from './ownership';
 
 const owned = (over: Partial<OwnedBook> = {}): OwnedBook => ({
-	id: 'b1', title: 'T', author: 'A', pages: 300, tagIds: [],
+	id: 'b1', title: 'T', author: 'A', pages: 300, entryIds: [], tagIds: [],
 	cover: { from: '#000', to: '#111', ink: '#fff', sub: '#ccc' }, addedAt: 1,
 	status: 'completed', currentPage: 300, finishedAt: 999,
 	owned: true, copies: 1, format: 'Hardcover', pricePaid: 20, estValue: 18, ...over
 });
 const wished = (over: Partial<WishedBook> = {}): WishedBook => ({
-	id: 'b2', title: 'W', author: 'A', pages: 200, tagIds: [],
+	id: 'b2', title: 'W', author: 'A', pages: 200, entryIds: [], tagIds: [],
 	cover: { from: '#000', to: '#111', ink: '#fff', sub: '#ccc' }, addedAt: 1,
 	status: 'to-read', currentPage: 0,
 	owned: false, wanted: true, estValue: 15, ...over
