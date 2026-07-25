@@ -44,6 +44,7 @@ export const en = {
 	'form.format_ph': 'Hardcover, Paperback…',
 	'form.year': 'Year',
 	'form.price': 'Price paid (optional)',
+	'form.est_value': 'Est. value (optional)',
 	'form.tags': 'Tags',
 	'form.add_submit': 'Add to shelf',
 	'form.save': 'Save changes',

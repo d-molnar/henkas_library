@@ -82,7 +82,7 @@ const make = ({ genres, labels, copies = 1, wanted, format, pricePaid, estValue,
 		tagIds: [...resolve(genres), ...resolve(labels)]
 	};
 	return copies >= 1
-		? { ...base, owned: true, copies, format, pricePaid, estValue }
+		? { ...base, owned: true, copies, format, pricePaid }
 		: { ...base, owned: false, wanted: wanted ?? true, estValue };
 };
 
@@ -100,7 +100,6 @@ const raw: Seed[] = [
 		notes: 'The mist as collective forgetting — compare with the framing in Never Let Me Go. Axl & Beatrice’s tenderness carries the whole quest structure. Re-read ch. 9 before book club.',
 		format: 'Hardcover',
 		pricePaid: 26,
-		estValue: 31.5,
 		year: 2015,
 		publisher: 'Faber & Faber',
 		genres: ['Fantasy', 'Literary'],
@@ -117,7 +116,6 @@ const raw: Seed[] = [
 		genres: ['Nature'],
 		format: 'Paperback',
 		pricePaid: 14,
-		estValue: 15,
 		startedAt: d(2026, 6, 30)
 	},
 	{
@@ -131,7 +129,6 @@ const raw: Seed[] = [
 		genres: ['Fantasy'],
 		format: 'Hardcover',
 		pricePaid: 18,
-		estValue: 20,
 		startedAt: d(2026, 7, 5)
 	},
 
@@ -206,8 +203,8 @@ const raw: Seed[] = [
 	{ title: 'The Dispossessed', author: 'Ursula K. Le Guin', status: 'completed', pages: 387, currentPage: 387, rating: 5, copies: 0, wanted: false, genres: ['Sci-fi'], finishedAt: d(2026, 6, 20) },
 
 	// ── Won't read (owned but set aside) ──
-	{ title: 'Infinite Jest', author: 'David Foster Wallace', status: 'wont-read', pages: 1079, genres: ['Literary'], format: 'Paperback', pricePaid: 18, estValue: 16 },
-	{ title: 'Atlas Shrugged', author: 'Ayn Rand', status: 'wont-read', pages: 1168, genres: ['Literary'], pricePaid: 9, estValue: 8 },
+	{ title: 'Infinite Jest', author: 'David Foster Wallace', status: 'wont-read', pages: 1079, genres: ['Literary'], format: 'Paperback', pricePaid: 18 },
+	{ title: 'Atlas Shrugged', author: 'Ayn Rand', status: 'wont-read', pages: 1168, genres: ['Literary'], pricePaid: 9 },
 
 	// ── On loan (owned, currently lent) ──
 	{
@@ -218,8 +215,7 @@ const raw: Seed[] = [
 		pages: 476,
 		genres: ['Sci-fi'],
 		format: 'Hardcover',
-		pricePaid: 22,
-		estValue: 24
+		pricePaid: 22
 	},
 	{
 		title: 'Circe',
@@ -241,7 +237,7 @@ const raw: Seed[] = [
 	{ title: 'The Other Wind', author: 'Ursula K. Le Guin', status: 'completed', pages: 246, currentPage: 246, rating: 4, copies: 0, wanted: false, genres: ['Fantasy'], entryIds: ['e-es-6'], finishedAt: d(2026, 5, 12) },
 
 	// ── Broken Earth ──
-	{ title: 'The Broken Earth Trilogy', author: 'N. K. Jemisin', status: 'reading', pages: 1400, currentPage: 900, genres: ['Sci-fi'], format: 'Omnibus', entryIds: ['e-be-1', 'e-be-2', 'e-be-3'], pricePaid: 30, estValue: 33, startedAt: d(2026, 7, 10) },
+	{ title: 'The Broken Earth Trilogy', author: 'N. K. Jemisin', status: 'reading', pages: 1400, currentPage: 900, genres: ['Sci-fi'], format: 'Omnibus', entryIds: ['e-be-1', 'e-be-2', 'e-be-3'], pricePaid: 30, startedAt: d(2026, 7, 10) },
 
 	// ── More completed across 2026 (drive the stats chart) ──
 	{ title: 'Dune', author: 'Frank Herbert', coverImage: '/covers/dune.svg', status: 'completed', pages: 688, currentPage: 688, rating: 5, genres: ['Sci-fi'], finishedAt: d(2026, 1, 30), pricePaid: 10 },

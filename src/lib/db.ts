@@ -85,6 +85,23 @@ class HenkaDB extends Dexie {
 				await tx.table('loans').clear();
 				await tx.table('tags').clear();
 			});
+		// v6 — the value axis follows ownership (ADR 0010): OwnedBook drops
+		// estValue. Pre-release: clear and reseed rather than migrate.
+		this.version(6)
+			.stores({
+				books: 'id, status, addedAt, finishedAt, isbn',
+				series: 'id',
+				seriesEntries: 'id, seriesId, ordinal',
+				loans: 'id, bookId, returnedAt',
+				tags: 'id, kind'
+			})
+			.upgrade(async (tx) => {
+				await tx.table('books').clear();
+				await tx.table('series').clear();
+				await tx.table('seriesEntries').clear();
+				await tx.table('loans').clear();
+				await tx.table('tags').clear();
+			});
 	}
 }
 

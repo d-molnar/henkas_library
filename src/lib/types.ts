@@ -39,12 +39,14 @@ export interface BookCore {
 	rating?: number;
 }
 
+/** The value axis follows ownership: what you *paid* is a fact about a book you
+ *  hold; what it's *worth* is an estimate for one you don't. The two never
+ *  coexist (ADR 0010). */
 export interface OwnedBook extends BookCore {
 	owned: true;
 	copies: number; // always >= 1
 	format?: string;
 	pricePaid?: number;
-	estValue?: number;
 }
 
 export interface WishedBook extends BookCore {

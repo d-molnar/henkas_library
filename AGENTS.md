@@ -86,6 +86,11 @@ src/
   copy (e.g. a book read at a library: `owned: false, wanted: false, status:
   'completed'`). **Reading status** itself is `reading | to-read | completed |
   wont-read` (wishlist is not a status — it's the unowned+wanted state).
+- **Value follows ownership** (ADR 0010): `OwnedBook` has `pricePaid` (what it
+  cost — a fact), `WishedBook` has `estValue` (what it would cost — an estimate),
+  and neither has the other. The figure does **not** carry across a transition:
+  acquiring drops the estimate, giving away leaves the estimate unset. The form
+  shows one money field whose label follows the copy count.
 - **Pure transitions live in `ownership.ts`**: `withCopies`, `acquired`,
   `withWanted` rebuild the correct variant while preserving `BookCore` fields;
   they're unit-tested in `ownership.test.ts`. Dexie mutations (`setCopies`,

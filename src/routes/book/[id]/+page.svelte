@@ -107,8 +107,7 @@
 					<div class="inv-grid">
 						<div><div class="k">{t('detail.copies')}</div><div class="v">{book.copies}</div></div>
 						<div><div class="k">{t('detail.format')}</div><div class="v">{book.format ?? '—'}</div></div>
-						<div><div class="k">{t('detail.paid')}</div><div class="v">{book.pricePaid != null ? `€${book.pricePaid.toFixed(2)}` : '—'}</div></div>
-						<div><div class="k">{t('detail.est_value')}</div><div class="v val">{book.estValue != null ? `€${book.estValue.toFixed(2)}` : '—'}</div></div>
+						<div><div class="k">{t('detail.paid')}</div><div class="v val">{book.pricePaid != null ? `€${book.pricePaid.toFixed(2)}` : '—'}</div></div>
 					</div>
 					<button class="btn btn-ghost" style="align-self:flex-start" onclick={() => addCopy(id)}>
 						<Plus size={14} strokeWidth={2.4} /> {t('detail.add_copy')}

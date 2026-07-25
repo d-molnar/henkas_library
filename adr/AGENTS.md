@@ -48,5 +48,7 @@ What becomes easier and harder as a result. Include the trade-offs we accepted.
 - `0006` — ISBN is an attribute, not identity
 - `0007` — Stay on classic TypeScript (defer the Go native port)
 - `0008` — Ownership as a discriminated union; reading is orthogonal (supersedes 0004)
+- `0009` — Series volumes as entities (`SeriesEntry`); books link many-to-many
+- `0010` — The value axis follows ownership: paid (owned) or estimated (wished), never both
 
 Keep this index in sync when adding an ADR.

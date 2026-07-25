@@ -43,6 +43,7 @@ export const sk: Partial<Record<MessageKey, string>> = {
 	'form.format_ph': 'Tvrdá väzba, Mäkká väzba…',
 	'form.year': 'Rok',
 	'form.price': 'Zaplatená cena (voliteľné)',
+	'form.est_value': 'Odhad. hodnota (voliteľné)',
 	'form.tags': 'Štítky',
 	'form.add_submit': 'Pridať na policu',
 	'form.save': 'Uložiť zmeny',
