@@ -57,9 +57,12 @@
 	--space-6: 26.4px;
 	--space-8: 35.2px;
 
+	/* One radius scale for the whole app, anchored on the book covers: a card and
+	   the cover sitting next to it must round the same. Only chips are pills. */
 	--radius-sm: 8px;
-	--radius-md: 16px;
-	--radius-lg: 28px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--radius-pill: 999px;
 
 	/* Elevation — derived from the ground. */
 	--shadow-sm: 0 1px 2px color-mix(in srgb, #2e2b25 14%, transparent);
@@ -496,16 +499,18 @@ textarea.input {
 	margin-top: var(--space-2);
 }
 
-/* — rounded frame: everything softens, small controls go pill — */
+/* — rounded frame — blocks share the cover's radius; only chips are pills. */
 .card,
 .dialog {
-	border-radius: calc(var(--radius-lg) * 1.15);
+	border-radius: var(--radius-lg);
 }
 .btn,
-.tag,
 .seg,
 .input {
-	border-radius: 999px;
+	border-radius: var(--radius-md);
+}
+.tag {
+	border-radius: var(--radius-pill);
 }
 .input {
 	padding-inline: 14px;

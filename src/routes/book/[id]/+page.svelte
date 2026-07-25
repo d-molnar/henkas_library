@@ -202,6 +202,7 @@
 	.topbar {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 10px;
 		margin-bottom: var(--space-4);
 	}
@@ -216,24 +217,38 @@
 	.back:hover {
 		color: var(--color-accent);
 	}
+	/* minmax(0, …) + min-width: 0 all the way down: without them a wide child
+	   (the inventory figures, a tag picker) sets the column's minimum and the
+	   whole page runs off the right edge. */
 	.layout {
 		display: grid;
-		grid-template-columns: 300px 1fr;
+		grid-template-columns: 300px minmax(0, 1fr);
 		gap: 32px;
 		align-items: start;
+	}
+	.side,
+	.main {
+		min-width: 0;
 	}
 	.side {
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
 	}
+	.side .card,
+	.main .card {
+		min-width: 0;
+	}
 	.detail-cover {
 		width: 100%;
 	}
 	.inv-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 10px;
+	}
+	.inv-grid .v {
+		overflow-wrap: anywhere;
 	}
 	.inv-grid .k {
 		font-size: 11px;
@@ -308,6 +323,17 @@
 		}
 		.side .card {
 			flex: 1;
+		}
+	}
+	@media (max-width: 560px) {
+		/* The inventory card is only ~200px wide beside the cover here — two
+		   columns force values like "Hardcover" to break mid-word. */
+		.inv-grid {
+			grid-template-columns: 1fr;
+			gap: 8px;
+		}
+		.inv-grid .v {
+			font-size: 17px;
 		}
 	}
 </style>

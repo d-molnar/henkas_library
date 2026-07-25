@@ -11,7 +11,8 @@
 	const pad = { sm: '10px', md: '14px', lg: '24px' };
 	const titleSize = { sm: '12px', md: '17px', lg: '30px' };
 	const authorSize = { sm: '9px', md: '11px', lg: '14px' };
-	const radius = { sm: '8px', md: '10px', lg: '14px' };
+	// Same scale as every other block in the app — see app.css :root.
+	const radius = { sm: 'var(--radius-sm)', md: 'var(--radius-md)', lg: 'var(--radius-lg)' };
 	// A very long title is clamped rather than clipped mid-word by overflow:hidden.
 	const titleLines = { sm: 3, md: 4, lg: 6 };
 </script>

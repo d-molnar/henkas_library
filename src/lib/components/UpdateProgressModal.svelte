@@ -180,7 +180,7 @@
 		gap: 10px;
 		align-items: center;
 		padding: 10px 12px;
-		border-radius: 18px;
+		border-radius: var(--radius-md);
 		background: var(--color-accent-2-100);
 		font-size: 13px;
 		color: var(--color-accent-2-800);
