@@ -5,6 +5,7 @@ export const en = {
 	'nav.more': 'More',
 	'more.title': 'More',
 	'app.language': 'Language',
+	'common.close': 'Close',
 
 	// statuses
 	'status.reading': 'Reading',
@@ -48,6 +49,7 @@ export const en = {
 	'form.tags': 'Tags',
 	'form.add_submit': 'Add to shelf',
 	'form.save': 'Save changes',
+	'form.cancel': 'Cancel',
 	'tag.placeholder': 'Add tags (Enter to confirm)',
 	'tag.placeholder_more': 'Add tag…',
 
@@ -71,7 +73,6 @@ export const en = {
 	'detail.format': 'Format',
 	'detail.paid': 'Paid',
 	'detail.est_value': 'Est. value',
-	'detail.add_copy': 'Add another copy',
 	'detail.wishlist_kicker': 'Wishlist',
 	'detail.not_owned_kicker': 'Not owned',
 	'detail.acquire': 'I own this now',
@@ -94,7 +95,11 @@ export const en = {
 	'progress.unit_percent': 'Percent',
 	'progress.of_pages': 'of {total} pages',
 	'progress.left': '{pct}% · {n} pages left',
+	'progress.back_n': 'Back {n} pages',
+	'progress.fwd_n': 'Forward {n} pages',
+	'progress.seek': 'Drag or tap to set the page',
 	'progress.session_note': 'Session note (optional)',
+	'progress.session_hint': 'Appended to the book’s notes as “p.{page}: …”.',
 	'progress.session_ph': 'Where you left off, a thought…',
 	'progress.mark_finished': 'Mark finished',
 	'progress.finished_hint': 'Finished it? Marks it Completed & logs today.',

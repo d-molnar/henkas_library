@@ -5,7 +5,10 @@ declare global {
 		// interface Error {}
 		// interface Locals {}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			/** Token pushed by <Modal> so the back button closes it (shallow routing). */
+			modal?: string;
+		}
 		// interface Platform {}
 	}
 }

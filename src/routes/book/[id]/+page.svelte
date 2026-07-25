@@ -26,6 +26,7 @@
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Plus from 'lucide-svelte/icons/plus';
+	import X from 'lucide-svelte/icons/x';
 
 	const id = $derived(page.params.id ?? '');
 	let bookStore = $derived(bookById(id));
@@ -47,9 +48,16 @@
 		if (book && book.id !== lastId && (book.tagIds.length === 0 || kindById.size > 0)) {
 			genreIds = book.tagIds.filter((tid) => kindById.get(tid) === 'genre');
 			labelIds = book.tagIds.filter((tid) => kindById.get(tid) !== 'genre');
-			noteDraft = book.notes ?? '';
 			lastId = book.id;
 		}
+	});
+
+	// Follow the stored notes whenever we're not mid-edit. Session notes from the
+	// progress modal are appended to the same field, so a draft seeded once on
+	// load would go stale and overwrite them on save.
+	$effect(() => {
+		const stored = book?.notes ?? '';
+		if (!editingNote) noteDraft = stored;
 	});
 
 	function persistTags() {
@@ -109,9 +117,6 @@
 						<div><div class="k">{t('detail.format')}</div><div class="v">{book.format ?? '—'}</div></div>
 						<div><div class="k">{t('detail.paid')}</div><div class="v val">{book.pricePaid != null ? `€${book.pricePaid.toFixed(2)}` : '—'}</div></div>
 					</div>
-					<button class="btn btn-ghost" style="align-self:flex-start" onclick={() => addCopy(id)}>
-						<Plus size={14} strokeWidth={2.4} /> {t('detail.add_copy')}
-					</button>
 				</div>
 			{:else}
 				<div class="card">
@@ -192,12 +197,37 @@
 
 {#if showEdit && book}
 	<Modal onclose={() => (showEdit = false)} width={640}>
-		<span class="dialog-title">{t('edit.title')}</span>
-		<BookForm initial={book} submitLabel={t('form.save')} onsubmit={saveEdit} />
+		<div class="head">
+			<span class="dialog-title">{t('edit.title')}</span>
+			<button
+				class="btn btn-secondary btn-icon"
+				aria-label={t('common.close')}
+				onclick={() => (showEdit = false)}
+			>
+				<X size={14} strokeWidth={2.4} />
+			</button>
+		</div>
+		<BookForm
+			initial={book}
+			submitLabel={t('form.save')}
+			onsubmit={saveEdit}
+			oncancel={() => (showEdit = false)}
+		/>
 	</Modal>
 {/if}
 
 <style>
+	.head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.head .btn-icon {
+		width: 30px;
+		height: 30px;
+		flex: none;
+	}
 	.topbar {
 		display: flex;
 		align-items: center;
@@ -253,9 +283,11 @@
 		font-size: 11px;
 		opacity: 0.55;
 	}
+	/* Inventory is reference data, not a headline — keep it quiet next to the
+	   title and progress. */
 	.inv-grid .v {
-		font-family: var(--font-heading);
-		font-size: 22px;
+		font-size: 15px;
+		font-weight: 600;
 	}
 	.inv-grid .v.val {
 		color: var(--color-accent-2-600);
@@ -329,10 +361,10 @@
 		   columns force values like "Hardcover" to break mid-word. */
 		.inv-grid {
 			grid-template-columns: 1fr;
-			gap: 8px;
+			gap: 6px;
 		}
 		.inv-grid .v {
-			font-size: 17px;
+			font-size: 14px;
 		}
 	}
 </style>

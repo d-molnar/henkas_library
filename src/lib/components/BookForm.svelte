@@ -15,11 +15,14 @@
 	let {
 		initial,
 		submitLabel = 'Add to shelf',
-		onsubmit
+		onsubmit,
+		oncancel
 	}: {
 		initial?: Book;
 		submitLabel?: string;
 		onsubmit: (values: BookInput) => void;
+		/** When given, a Cancel button sits beside the submit button. */
+		oncancel?: () => void;
 	} = $props();
 
 	// form fields
@@ -233,6 +236,9 @@
 	</div>
 
 	<div class="dialog-actions">
+		{#if oncancel}
+			<button type="button" class="btn btn-ghost" onclick={oncancel}>{t('form.cancel')}</button>
+		{/if}
 		<button type="submit" class="btn btn-primary" disabled={!canSubmit}>{submitLabel}</button>
 	</div>
 </form>
