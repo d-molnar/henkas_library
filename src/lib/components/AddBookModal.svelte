@@ -47,11 +47,11 @@
 	{:else}
 		<div class="head">
 			<span class="dialog-title">{t('add.title')}</span>
-			<button class="btn btn-secondary btn-icon" aria-label="Close" onclick={closeModal}>
+			<button class="btn btn-secondary btn-icon" aria-label={t('common.close')} onclick={closeModal}>
 				<X size={14} strokeWidth={2.4} />
 			</button>
 		</div>
-		<BookForm submitLabel={t('form.add_submit')} onsubmit={handleSubmit} />
+		<BookForm submitLabel={t('form.add_submit')} onsubmit={handleSubmit} oncancel={closeModal} />
 	{/if}
 </Modal>
 
