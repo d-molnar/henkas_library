@@ -2,15 +2,14 @@
 	import '../app.css';
 	import { page } from '$app/state';
 	import { ensureSeeded } from '$lib/db';
-	import { openAdd } from '$lib/ui.svelte';
 	import { t, i18n, setLocale, LOCALES, type LocaleCode } from '$lib/i18n/index.svelte';
 	import ModalHost from '$lib/components/ModalHost.svelte';
 	import BookIcon from 'lucide-svelte/icons/book-open';
-	import Plus from 'lucide-svelte/icons/plus';
 	import LibraryBig from 'lucide-svelte/icons/library-big';
 	import Languages from 'lucide-svelte/icons/languages';
 	import TagsIcon from 'lucide-svelte/icons/tags';
 	import Layers from 'lucide-svelte/icons/layers';
+	import Ellipsis from 'lucide-svelte/icons/ellipsis';
 
 	let { children } = $props();
 
@@ -48,9 +47,6 @@
 				{/each}
 			</select>
 		</label>
-		<button class="btn btn-primary" onclick={openAdd}>
-			<Plus size={16} strokeWidth={2.6} /> {t('nav.add')}
-		</button>
 	</nav>
 
 	<main class="app-main">
@@ -70,10 +66,10 @@
 			<TagsIcon size={20} strokeWidth={2.2} />
 			<span>{t('nav.tags')}</span>
 		</a>
-		<button type="button" onclick={openAdd} class="tab-btn">
-			<Plus size={20} strokeWidth={2.2} />
-			<span>{t('nav.add_short')}</span>
-		</button>
+		<a href="/more" aria-current={path === '/more' ? 'page' : undefined}>
+			<Ellipsis size={20} strokeWidth={2.2} />
+			<span>{t('nav.more')}</span>
+		</a>
 	</nav>
 </div>
 
@@ -101,19 +97,20 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 5px;
+		white-space: nowrap;
 	}
-	.tab-btn {
-		background: none;
-		border: 0;
-		cursor: pointer;
-		font: inherit;
-		color: inherit;
+	/* Phone gets the tab bar instead — never both bars. */
+	@media (max-width: 640px) {
+		.topnav {
+			display: none;
+		}
 	}
 	.lang {
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
 		opacity: 0.75;
+		margin-left: auto; /* the language select closes out the bar */
 	}
 	.lang select {
 		border: 0;

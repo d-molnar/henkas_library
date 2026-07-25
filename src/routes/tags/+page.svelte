@@ -176,9 +176,19 @@
 	.merge:hover {
 		border-color: var(--color-accent);
 	}
+	/* Phone: the name keeps the first line to itself; the controls wrap below it
+	   rather than squeezing the input down to a few characters. */
 	@media (max-width: 560px) {
+		.row {
+			flex-wrap: wrap;
+			row-gap: var(--space-2);
+		}
+		.name {
+			flex-basis: calc(100% - 12px - var(--space-3));
+		}
 		.merge {
-			max-width: 96px;
+			flex: 1;
+			max-width: none;
 		}
 	}
 </style>

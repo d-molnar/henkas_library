@@ -55,9 +55,15 @@
 </script>
 
 <div class="shelf-head">
-	<div class="searchbar">
-		<Search size={16} strokeWidth={2.2} class="search-ico" />
-		<input class="input search" placeholder={t('shelf.search')} bind:value={query} />
+	<div class="shelf-top">
+		<div class="searchbar">
+			<Search size={16} strokeWidth={2.2} class="search-ico" />
+			<input class="input search" placeholder={t('shelf.search')} bind:value={query} />
+		</div>
+		<button class="btn btn-primary add" aria-label={t('nav.add')} onclick={openAdd}>
+			<Plus size={16} strokeWidth={2.6} />
+			<span>{t('nav.add')}</span>
+		</button>
 	</div>
 	<div class="filters">
 		<button class="tag" class:active={filter === 'all'} onclick={() => (filter = 'all')}>
@@ -115,9 +121,32 @@
 		gap: 12px;
 		margin-bottom: var(--space-6);
 	}
+	.shelf-top {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
 	.searchbar {
 		position: relative;
+		flex: 1;
+		min-width: 0;
 		max-width: 420px;
+	}
+	.add {
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+	/* Phone: the label would crowd the search field — keep just the + glyph. */
+	@media (max-width: 560px) {
+		.add span {
+			display: none;
+		}
+		.add {
+			width: 44px;
+			height: 44px;
+			padding: 0;
+			justify-content: center;
+		}
 	}
 	.searchbar :global(.search-ico) {
 		position: absolute;
@@ -157,17 +186,18 @@
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(6, 1fr);
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		align-items: start;
 		gap: 18px;
 	}
 	@media (max-width: 900px) {
 		.grid {
-			grid-template-columns: repeat(4, 1fr);
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 	}
 	@media (max-width: 560px) {
 		.grid {
-			grid-template-columns: repeat(3, 1fr);
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 12px;
 		}
 	}

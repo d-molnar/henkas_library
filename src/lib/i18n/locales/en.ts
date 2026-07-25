@@ -2,7 +2,8 @@ export const en = {
 	// nav / shell
 	'nav.add': 'Add book',
 	'nav.shelf': 'Shelf',
-	'nav.add_short': 'Add',
+	'nav.more': 'More',
+	'more.title': 'More',
 	'app.language': 'Language',
 
 	// statuses
@@ -121,7 +122,7 @@ export const en = {
 	'series.counts': 'own {owned} of {available} · read {read}',
 	'series.next': 'Next: {title}',
 	'series.missing': '{count} missing',
-	'series.complete': 'Complete',
+	'series.complete': 'All owned',
 	'series.volumes': 'Volumes',
 	'series.hide_volumes': 'Hide volumes',
 	'series.vol_owned': 'Owned',

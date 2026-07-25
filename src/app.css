@@ -113,6 +113,21 @@ h6 {
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
+/* Phone type scale — the display sizes are tuned for tablet width. */
+@media (max-width: 640px) {
+	h1 {
+		font-size: 30px;
+	}
+	h2 {
+		font-size: 25px;
+	}
+	h3 {
+		font-size: 21px;
+	}
+	h4 {
+		font-size: 18px;
+	}
+}
 p {
 	margin: 0 0 var(--space-3);
 }
@@ -251,6 +266,17 @@ figcaption {
 textarea.input {
 	min-height: 90px;
 	resize: vertical;
+}
+/* iOS Safari zooms the page when a focused field is under 16px. Bump fields and
+   grow the touch target on phones — the 14px look is a desktop-only detail. */
+@media (max-width: 640px) {
+	.input,
+	select {
+		font-size: 16px;
+	}
+	.input {
+		min-height: 44px;
+	}
 }
 .radio {
 	display: inline-flex;
@@ -443,6 +469,9 @@ textarea.input {
 }
 .dialog {
 	width: min(440px, 100%);
+	/* Short viewport (phone, or keyboard up): the dialog scrolls, not the page. */
+	max-height: calc(100dvh - var(--space-8));
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-3);
@@ -501,6 +530,9 @@ select {
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
+	/* A single wide child must never turn the whole page into a sideways
+	   scroller — on a phone that breaks every screen at once. */
+	overflow-x: hidden;
 }
 .app-main {
 	flex: 1;
@@ -508,10 +540,14 @@ select {
 	max-width: 1100px;
 	margin: 0 auto;
 	padding: var(--space-4) var(--space-6) calc(var(--space-8) * 2);
+	min-width: 0;
 }
 @media (max-width: 640px) {
 	.app-main {
-		padding: var(--space-3) var(--space-4) calc(var(--space-8) * 3);
+		/* Top: clear the notch / dynamic island. Bottom: clear the tab bar,
+		   which is fixed and sits over the content. */
+		padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-4)
+			calc(var(--space-8) * 3);
 	}
 }
 
@@ -591,15 +627,24 @@ select {
 	}
 	.tabbar a {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		gap: 3px;
+		min-height: 44px; /* thumb-sized target */
 		color: inherit;
 		text-decoration: none;
 		opacity: 0.55;
 		font-size: 10px;
 		font-weight: 600;
+	}
+	.tabbar a span {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.tabbar a[aria-current='page'] {
 		opacity: 1;

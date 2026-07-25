@@ -253,6 +253,7 @@
 	}
 	.title {
 		margin: 4px 0 2px;
+		overflow-wrap: anywhere; /* long single-word titles must not widen the page */
 	}
 	.author {
 		margin: 0 0 10px;

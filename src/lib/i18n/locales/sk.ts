@@ -4,7 +4,8 @@ import type { MessageKey } from './en';
 export const sk: Partial<Record<MessageKey, string>> = {
 	'nav.add': 'Pridať knihu',
 	'nav.shelf': 'Polica',
-	'nav.add_short': 'Pridať',
+	'nav.more': 'Viac',
+	'more.title': 'Viac',
 	'app.language': 'Jazyk',
 
 	'status.reading': 'Číta sa',
@@ -114,7 +115,7 @@ export const sk: Partial<Record<MessageKey, string>> = {
 	'series.counts': 'vlastníš {owned} z {available} · prečítané {read}',
 	'series.next': 'Ďalej: {title}',
 	'series.missing': 'chýba {count}',
-	'series.complete': 'Kompletné',
+	'series.complete': 'Máš všetko',
 	'series.volumes': 'Zväzky',
 	'series.hide_volumes': 'Skryť zväzky',
 	'series.vol_owned': 'Vlastním',
