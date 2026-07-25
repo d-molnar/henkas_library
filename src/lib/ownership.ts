@@ -5,6 +5,7 @@ function core(b: Book): BookCore {
 	const { owned, ...rest } = b as OwnedBook & { wanted?: boolean };
 	const { copies, format, pricePaid, wanted, estValue, ...c } = rest as OwnedBook & {
 		wanted?: boolean;
+		estValue?: number;
 	};
 	return c;
 }
@@ -12,7 +13,11 @@ function core(b: Book): BookCore {
 /**
  * Set the owned copy count. `n >= 1` → owned with that many copies; `n <= 0` →
  * unowned and NOT wanted (you no longer hold it, but losing a copy doesn't mean
- * you wish for it). Reading fields are always preserved. estValue carries over.
+ * you wish for it). Reading fields are always preserved.
+ *
+ * The value field does NOT carry across the boundary (ADR 0010): acquiring a
+ * book drops the estimate, and giving one away leaves the estimate unset —
+ * what you once paid says nothing about what replacing it would cost.
  */
 export function withCopies(b: Book, n: number): Book {
 	const count = Math.floor(n);
@@ -22,17 +27,16 @@ export function withCopies(b: Book, n: number): Book {
 			owned: true,
 			copies: count,
 			format: b.owned ? b.format : undefined,
-			pricePaid: b.owned ? b.pricePaid : undefined,
-			estValue: b.estValue
+			pricePaid: b.owned ? b.pricePaid : undefined
 		};
 	}
-	return { ...core(b), owned: false, wanted: false, estValue: b.estValue };
+	return { ...core(b), owned: false, wanted: false };
 }
 
 /** Add a copy: increment an owned book, or acquire an unowned one (→ 1 copy). */
 export function acquired(b: Book): OwnedBook {
 	if (b.owned) return { ...b, copies: b.copies + 1 };
-	return { ...core(b), owned: true, copies: 1, estValue: b.estValue };
+	return { ...core(b), owned: true, copies: 1 };
 }
 
 /** Toggle wishlist desire on an unowned book; owned books are returned unchanged. */

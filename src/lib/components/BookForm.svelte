@@ -31,7 +31,12 @@
 	let copies = $state(initial ? (initial.owned ? String(initial.copies) : '0') : '1');
 	const isWish = $derived(Number(copies) === 0);
 	let format = $state(initial && initial.owned ? (initial.format ?? '') : '');
-	let price = $state(initial && initial.owned && initial.pricePaid != null ? String(initial.pricePaid) : '');
+	// One field, two meanings — pricePaid when held, estValue when not.
+	let price = $state(
+		initial
+			? String((initial.owned ? initial.pricePaid : initial.estValue) ?? '')
+			: ''
+	);
 	let year = $state(initial?.year ? String(initial.year) : '');
 	let publisher = $state(initial?.publisher ?? '');
 	let coverImage = $state(initial?.coverImage);
@@ -114,8 +119,8 @@
 			format: wish ? undefined : format.trim() || undefined,
 			year: year ? Number(year) : undefined,
 			publisher: publisher.trim() || undefined,
-			pricePaid: wish ? undefined : price ? Number(price) : undefined,
-			estValue: initial?.estValue,
+			pricePaid: wish || !price ? undefined : Number(price),
+			estValue: wish && price ? Number(price) : undefined,
 			tagIds: [...genreIds, ...labelIds],
 			coverImage
 		});
@@ -216,12 +221,11 @@
 		</div>
 	</div>
 
-	{#if !isWish}
-		<div class="field">
-			<label for="price">{t('form.price')}</label>
-			<input id="price" class="input" type="number" step="0.01" bind:value={price} placeholder="€ 0.00" />
-		</div>
-	{/if}
+	<!-- One value field, whichever applies: paid (held) or estimated (not held). -->
+	<div class="field">
+		<label for="price">{isWish ? t('form.est_value') : t('form.price')}</label>
+		<input id="price" class="input" type="number" step="0.01" bind:value={price} placeholder="€ 0.00" />
+	</div>
 
 	<div class="field">
 		<span class="lbl">{t('form.tags')}</span>

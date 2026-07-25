@@ -7,10 +7,9 @@ export interface LibraryStats {
 	pagesThisYear: number;
 	streakDays: number;
 	perMonth: { label: string; count: number; current: boolean }[];
-	collectionValue: number;
+	collectionValue: number; // what the owned shelf cost, summed over copies
 	totalCopies: number;
 	avgPaid: number;
-	valueVsPaid: number;
 	pricedCount: number;
 	topGenres: { name: string; count: number }[];
 }
@@ -32,15 +31,11 @@ export function deriveStats(books: Book[], _loans: Loan[], tags: Tag[], now = ne
 		perMonth.push({ label: MONTHS[m], count, current: m === monthsSoFar });
 	}
 
+	// Owned books carry only what they cost (ADR 0010), so "what the shelf is
+	// worth" is what the shelf cost — there is no estimate to compare against.
 	const priced = owned.filter((b) => typeof b.pricePaid === 'number');
 	const totalPaid = priced.reduce((n, b) => n + (b.pricePaid ?? 0) * b.copies, 0);
-	const collectionValue = owned.reduce(
-		(n, b) => n + (b.estValue ?? b.pricePaid ?? 0) * b.copies,
-		0
-	);
 	const totalCopies = owned.reduce((n, b) => n + b.copies, 0);
-	const valued = owned.filter((b) => typeof b.estValue === 'number' || typeof b.pricePaid === 'number');
-	const valueOfPriced = priced.reduce((n, b) => n + (b.estValue ?? b.pricePaid ?? 0) * b.copies, 0);
 
 	const genreNameById = new Map(tags.filter((t) => t.kind === 'genre').map((t) => [t.id, t.name]));
 	const genreCounts = new Map<string, number>();
@@ -60,10 +55,9 @@ export function deriveStats(books: Book[], _loans: Loan[], tags: Tag[], now = ne
 		pagesThisYear,
 		streakDays: 18, // reading-session streak — placeholder until sessions are logged
 		perMonth,
-		collectionValue: Math.round(collectionValue),
+		collectionValue: Math.round(totalPaid),
 		totalCopies,
 		avgPaid: priced.length ? totalPaid / priced.length : 0,
-		valueVsPaid: Math.round(valueOfPriced - totalPaid),
 		pricedCount: priced.length,
 		topGenres
 	};

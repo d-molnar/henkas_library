@@ -6,7 +6,7 @@ const owned = (over: Partial<OwnedBook> = {}): OwnedBook => ({
 	id: 'b1', title: 'T', author: 'A', pages: 300, entryIds: [], tagIds: [],
 	cover: { from: '#000', to: '#111', ink: '#fff', sub: '#ccc' }, addedAt: 1,
 	status: 'completed', currentPage: 300, finishedAt: 999,
-	owned: true, copies: 1, format: 'Hardcover', pricePaid: 20, estValue: 18, ...over
+	owned: true, copies: 1, format: 'Hardcover', pricePaid: 20, ...over
 });
 const wished = (over: Partial<WishedBook> = {}): WishedBook => ({
 	id: 'b2', title: 'W', author: 'A', pages: 200, entryIds: [], tagIds: [],
@@ -24,7 +24,9 @@ describe('withCopies', () => {
 		expect(r.status).toBe('completed');
 		expect(r.currentPage).toBe(300);
 		expect(r.finishedAt).toBe(999);
-		expect(r.estValue).toBe(18);
+		// The value axis does not cross the boundary (ADR 0010): what it cost
+		// says nothing about what replacing it would cost.
+		expect(r.estValue).toBeUndefined();
 		expect('copies' in r).toBe(false);
 		expect('format' in r).toBe(false);
 		expect('pricePaid' in r).toBe(false);
@@ -36,7 +38,7 @@ describe('withCopies', () => {
 		expect(r.copies).toBe(2);
 		expect(r.status).toBe('reading');
 		expect(r.currentPage).toBe(10);
-		expect(r.estValue).toBe(15);
+		expect('estValue' in r).toBe(false);
 		expect('wanted' in r).toBe(false);
 	});
 	it('owned → owned keeps owned-only fields', () => {
@@ -58,6 +60,7 @@ describe('acquired', () => {
 		expect(r.status).toBe('completed');
 		expect(r.currentPage).toBe(200);
 		expect('wanted' in r).toBe(false);
+		expect('estValue' in r).toBe(false);
 	});
 });
 

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+	<defs>
+		<linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#272e1b" />
+			<stop offset="0.6" stop-color="#56633f" />
+			<stop offset="1" stop-color="#8fa073" />
+		</linearGradient>
+	</defs>
+	<rect width="400" height="600" fill="url(#hsky)" />
+	<circle cx="308" cy="96" r="30" fill="#f0fae1" opacity="0.9" />
+	<path d="M0 300 C70 250 140 268 200 300 C260 332 330 320 400 286 L400 600 L0 600 Z" fill="#3d472b" />
+	<path d="M0 372 C80 340 150 380 220 396 C290 412 340 396 400 372 L400 600 L0 600 Z" fill="#272e1b" />
+	<g transform="translate(200 452)">
+		<circle r="52" fill="#728157" />
+		<circle r="44" fill="#8c491a" />
+		<circle r="38" fill="#b2622d" />
+		<circle cx="20" cy="0" r="4" fill="#ffe1d0" />
+		<rect x="-38" y="-2" width="76" height="3" fill="#8c491a" opacity="0.6" />
+	</g>
+	<text x="200" y="120" text-anchor="middle" font-family="Georgia, serif" font-size="46"
+		letter-spacing="3" fill="#f0fae1">The Hobbit</text>
+	<text x="200" y="156" text-anchor="middle" font-family="Georgia, serif" font-size="16"
+		letter-spacing="6" fill="#ccdbb2">THERE AND BACK AGAIN</text>
+	<text x="200" y="566" text-anchor="middle" font-family="Georgia, serif" font-size="18"
+		letter-spacing="3" fill="#e1eecc">J. R. R. TOLKIEN</text>
+</svg>

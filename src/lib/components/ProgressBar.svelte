@@ -21,6 +21,7 @@
 
 <div
 	class="progress"
+	class:has-knob={knob}
 	style:height="{height}px"
 	role="progressbar"
 	aria-valuenow={Math.round(pct)}
@@ -35,6 +36,11 @@
 <style>
 	.progress {
 		position: relative;
+	}
+	/* .progress clips its fill to stay rounded, which also chopped the knob into
+	   a square. The fill is rounded on its own, so let the knob out of the box. */
+	.progress.has-knob {
+		overflow: visible;
 	}
 	.knob {
 		position: absolute;

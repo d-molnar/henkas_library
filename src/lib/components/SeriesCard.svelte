@@ -104,12 +104,15 @@
 	.seriescard {
 		gap: var(--space-2);
 	}
-	/* Leaning stack of volume spines, one per canonical entry. */
+	/* Leaning stack of volume spines, one per canonical entry. A long series
+	   scrolls inside the card rather than widening it. */
 	.spines {
 		display: flex;
 		align-items: flex-end;
 		padding: var(--space-3) var(--space-2) var(--space-2);
 		min-height: 96px;
+		overflow-x: auto;
+		scrollbar-width: none;
 	}
 	.spine {
 		width: 20px;
@@ -147,6 +150,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
+		min-width: 0;
+		overflow-wrap: anywhere;
 	}
 	.counts {
 		font-size: 12px;

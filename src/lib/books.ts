@@ -53,8 +53,10 @@ function coreFromInput(input: BookInput, base: Pick<BookCore, 'id' | 'cover' | '
 }
 
 function buildBook(coreFields: BookCore, copies: number, input: BookInput, wantedWhenUnowned = true): Book {
+	// Value follows ownership (ADR 0010): a held book records what it cost, an
+	// unheld one what it would cost. Whichever field doesn't apply is dropped.
 	return copies >= 1
-		? { ...coreFields, owned: true, copies, format: input.format, pricePaid: input.pricePaid, estValue: input.estValue }
+		? { ...coreFields, owned: true, copies, format: input.format, pricePaid: input.pricePaid }
 		: { ...coreFields, owned: false, wanted: wantedWhenUnowned, estValue: input.estValue };
 }
 
