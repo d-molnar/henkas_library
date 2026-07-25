@@ -172,6 +172,13 @@
 		font-variant-numeric: tabular-nums;
 		cursor: pointer;
 		transition: background 0.12s ease;
+		/* Rapid taps were landing as +1, +2, +2: while double-tap-to-zoom is armed
+		   the browser replays a compatibility click on the 2nd and 3rd tap of the
+		   gesture. manipulation opts the button out of double-tap (and its 300ms
+		   delay); no-select keeps a fast burst from selecting the label. */
+		touch-action: manipulation;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 	/* the bare +/− carries the same ink as "+10" at this size */
 	.step.one {
