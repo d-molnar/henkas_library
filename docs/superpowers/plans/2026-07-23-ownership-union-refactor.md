@@ -16,7 +16,6 @@
 - **Pre-release, no migrations:** bump the Dexie version and let `ensureSeeded()` reseed. Do NOT write `.upgrade()` data-preservation logic.
 - `owned` is a boolean discriminant — **stored but NOT a Dexie index** (IndexedDB keys can't be booleans).
 - Icons via `lucide-svelte/icons/<name>`, `strokeWidth={2.4}`.
-- Commit trailer on every commit: `Claude-Session: https://claude.ai/code/session_01PW3L8es9LPSRwmbduaCuws`.
 
 ---
 
@@ -87,9 +86,7 @@ git add package.json package-lock.json vitest.config.ts src/lib/ownership.test.t
 git commit -m "chore: add Vitest for pure-logic unit tests
 
 Harness only — no app source touched. Enables TDD of the ownership
-transition logic in the model refactor (task 0011).
-
-Claude-Session: https://claude.ai/code/session_01PW3L8es9LPSRwmbduaCuws"
+transition logic in the model refactor (task 0011)."
 ```
 
 ---
@@ -846,9 +843,7 @@ are common (valid whether or not you own a copy). copies:0 and owned+wished
 are unrepresentable. Pure transitions (withCopies/acquired/withWanted) in
 ownership.ts are unit-tested; Dexie mutations put() a rebuilt row so no
 stale variant fields linger. Schema v3 reseeds. All consumers narrow on
-book.owned.
-
-Claude-Session: https://claude.ai/code/session_01PW3L8es9LPSRwmbduaCuws"
+book.owned."
 ```
 
 ---

@@ -329,9 +329,7 @@ git commit -m "feat: series volumes as entities — reshape data model (schema v
 Add SeriesEntry entity + table; Book gains entryIds and drops
 seriesId/seriesIndex; Series drops totalVolumes. Reshape seed with an
 omnibus, a novella, a named-missing volume, and a read-at-library volume.
-Pre-release clear+reseed. Part of task 0013 / ADR 0009.
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+Pre-release clear+reseed. Part of task 0013 / ADR 0009."
 ```
 
 ---
@@ -540,9 +538,7 @@ Expected: PASS (6 tests). Then `npm run check` → 0 errors.
 
 ```bash
 git add src/lib/series.ts src/lib/series.test.ts
-git commit -m "feat: deriveSeriesProgress — per-volume slots (ownership union, reading orthogonal)
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+git commit -m "feat: deriveSeriesProgress — per-volume slots (ownership union, reading orthogonal)"
 ```
 
 ---
@@ -670,9 +666,7 @@ Run: `npm test` → all pass (unchanged).
 
 ```bash
 git add src/lib/series.ts
-git commit -m "feat: series & entry mutations (create/ensure/add/edit/remove/link)
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+git commit -m "feat: series & entry mutations (create/ensure/add/edit/remove/link)"
 ```
 
 ---
@@ -862,9 +856,7 @@ Expected: PASS (all `series.test.ts` tests). Then `npm run check` → 0 errors.
 
 ```bash
 git add src/lib/series.ts src/lib/series.test.ts
-git commit -m "feat: series detection helpers (parseSeriesHint, matchLocalSeries, detectSeriesCandidates)
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+git commit -m "feat: series detection helpers (parseSeriesHint, matchLocalSeries, detectSeriesCandidates)"
 ```
 
 ---
@@ -1009,9 +1001,7 @@ Expected: PASS (3 tests). Then `npm run check` → 0 errors and `npm run build` 
 
 ```bash
 git add src/lib/openlibrary.ts src/lib/openlibrary.test.ts
-git commit -m "feat: best-effort series roster lookup + series hint on Open Library results
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+git commit -m "feat: best-effort series roster lookup + series hint on Open Library results"
 ```
 
 ---
@@ -1057,9 +1047,7 @@ Run: `npm run check` → 0 errors (docs don't affect it, but confirm nothing reg
 
 ```bash
 git add adr/0009-series-volumes-as-entities.md AGENTS.md tasks/0013-series-domain-remodel.md tasks/0004-series-screen.md
-git commit -m "docs: ADR 0009 + AGENTS/task updates for series volume entities
-
-Claude-Session: https://claude.ai/code/session_012mMWEhN4KdsCHZqJjPt3kP"
+git commit -m "docs: ADR 0009 + AGENTS/task updates for series volume entities"
 ```
 
 ---
