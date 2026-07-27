@@ -34,8 +34,16 @@
 		page = Math.max(0, Math.min(n, total));
 	}
 	function step(delta: number) {
+		// A double-tap replays a synthetic click (pointerType "mouse", followed by
+		// dblclick) *while the finger is still down*, so a burst of five taps
+		// counted eight. A genuine click can only land after the pointer is
+		// released, so anything arriving mid-press is that echo.
+		if (pressing) return;
 		clamp((Number.isFinite(page) ? page : 0) + delta);
 	}
+
+	/** True between pointerdown and pointerup anywhere on the page. */
+	let pressing = false;
 
 	async function save() {
 		await updateProgress(bookId, page);
@@ -51,6 +59,14 @@
 		closeModal();
 	}
 </script>
+
+<!-- tracked on window: the finger may lift outside the button it started on,
+     and pointerup always precedes the click it produces -->
+<svelte:window
+	onpointerdown={() => (pressing = true)}
+	onpointerup={() => (pressing = false)}
+	onpointercancel={() => (pressing = false)}
+/>
 
 <Modal onclose={closeModal} width={520}>
 	{#if $book}
@@ -172,10 +188,9 @@
 		font-variant-numeric: tabular-nums;
 		cursor: pointer;
 		transition: background 0.12s ease;
-		/* Rapid taps were landing as +1, +2, +2: while double-tap-to-zoom is armed
-		   the browser replays a compatibility click on the 2nd and 3rd tap of the
-		   gesture. manipulation opts the button out of double-tap (and its 300ms
-		   delay); no-select keeps a fast burst from selecting the label. */
+		/* No double-tap gesture on a step (this drops the 300ms tap delay, though
+		   not the echo click — see `pressing` above); a fast burst shouldn't
+		   select the label either. */
 		touch-action: manipulation;
 		user-select: none;
 		-webkit-user-select: none;

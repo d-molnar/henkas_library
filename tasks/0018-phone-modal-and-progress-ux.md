@@ -51,6 +51,17 @@ with your thumb.
   The draft now follows `book.notes` whenever the editor isn't open. Added a
   hint under the session-note field spelling out that it appends as `p.N: …`.
 
+- **Rapid taps counted twice.** A burst of five taps on `+` moved the page eight
+  pages. Instrumenting every pointer/mouse/click event on the group showed why:
+  a double-tap makes the browser replay a synthetic click (`pointerType: 'mouse'`,
+  followed by `dblclick`) **while the finger is still down**, before `pointerup`.
+  `touch-action: manipulation` does not suppress it (at least not under Chrome's
+  touch emulation). A genuine click can only be dispatched after the pointer is
+  released, so `step()` ignores any click that arrives mid-press — `pressing` is
+  tracked on `window`, since the finger may lift outside the button it started
+  on. Synthetic clicks (Playwright, keyboard Enter) never set it, so automation
+  and a11y are unaffected.
+
 ## Verified
 
 Headless Chromium at the iPhone 14 viewport, against `npm run dev`:
